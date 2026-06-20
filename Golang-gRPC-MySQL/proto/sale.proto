@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package sale;
+
+option go_package = "://github.com";
+
+import "google/type/decimal.proto";
+import "google/protobuf/timestamp.proto"; 
+
+message Sale {
+  string id = 1;            
+  google.type.Decimal sales_amount = 2;
+  google.protobuf.Timestamp sales_date = 3;
+}
+
+message GetSaleRequest {
+  string id = 1;
+}
+
+message GetSaleResponse {
+  Sale sale = 1;
+}
+
+service SaleService {
+  rpc GetSale (GetSaleRequest) returns (GetSaleResponse);
+}

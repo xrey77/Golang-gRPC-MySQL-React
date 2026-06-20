@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package product;
+
+option go_package = "://github.com";
+
+import "google/type/decimal.proto";
+
+message Product {
+  string id = 1;          
+  string descriptions = 2;
+  int32 qty = 3;
+  string unit = 4;
+  
+  google.type.Decimal cost_price = 5;
+  google.type.Decimal sell_price = 6;
+  google.type.Decimal sale_price = 7;
+  
+  string productpicture = 8;
+  int32 alert_stocks = 9;
+  int32 critical_stocks = 10;
+}
+
+message GetProductRequest {
+  string id = 1;
+}
+
+message GetProductResponse {
+  Product product = 1;
+}
+
+service ProductService {
+  rpc GetProduct (GetProductRequest) returns (GetProductResponse);
+}
