@@ -1,11 +1,11 @@
 syntax = "proto3";
 
-package sale;
+package proto;
 
 option go_package = "://github.com";
 
-import "google/type/decimal.proto";
-import "google/protobuf/timestamp.proto"; 
+import "third_party/google/type/decimal.proto";
+import "third_party/google/protobuf/timestamp.proto"; 
 
 message Sale {
   string id = 1;            

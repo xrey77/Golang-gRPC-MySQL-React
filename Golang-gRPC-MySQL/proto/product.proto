@@ -1,12 +1,13 @@
 syntax = "proto3";
 
-package product;
+package proto;
 
 option go_package = "://github.com";
 
-import "google/type/decimal.proto";
+import "third_party/google/type/decimal.proto";
 
-message Product {
+
+message ProductData {
   string id = 1;          
   string descriptions = 2;
   int32 qty = 3;
@@ -26,7 +27,7 @@ message GetProductRequest {
 }
 
 message GetProductResponse {
-  Product product = 1;
+  ProductData product = 1;
 }
 
 service ProductService {
