@@ -15,10 +15,10 @@ type User struct {
 	Mobile      string    `gorm:"size:255;default:null"`
 	Username    string    `gorm:"size:255;uniqueIndex;not:null;type:varchar(255) COLLATE utf8mb4_bin"`
 	Password    string    `gorm:"size:255"`
-	Isactivated int       `gorm:"type:integer;default:1"`
-	Isblocked   int       `gorm:"type:integer;default:0"`
+	Isactivated bool      `gorm:"type:tinyint(1);default:1"`
+	Isblocked   bool      `gorm:"type:tinyint(1);default:0"`
 	Userpicture string    `gorm:"default:pix.png"`
-	Mailtoken   string    `gorm:"type:integer;default:0"`
+	Mailtoken   int32     `gorm:"type:integer;default:0"`
 	Secret      string    `gorm:"type:text;default:null"`
 	Qrcodeurl   string    `gorm:"type:text;default:null"`
 	CreatedAt   time.Time `gorm:"default:CURRENT_TIMESTAMP(3)"`

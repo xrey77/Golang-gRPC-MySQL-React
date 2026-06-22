@@ -1,4 +1,4 @@
-<h3>GOLANG V1.24 - gRPC - MySQL - Angular CLI 21 Starter Project</h3>
+<h3>GOLANG V1.25.8 - gRPC - MySQL - Angular CLI 21 Starter Project</h3>
 
 <h4>Angular CLI Dependencies</h4>
 <p>1. node 23.5.0</p>

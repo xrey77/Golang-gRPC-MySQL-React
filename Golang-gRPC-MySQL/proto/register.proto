@@ -21,6 +21,6 @@ message RegisterResponse {
     RegisterMessage msg = 1;
 }
 
-service AuthService {
+service RegisterService {
   rpc Register (RegisterRequest) returns (RegisterResponse);
 }

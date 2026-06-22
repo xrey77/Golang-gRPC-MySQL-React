@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package proto;
 
+import "google/protobuf/wrappers.proto";
+
 option go_package = "://github.com";
 
 message LoginData {
@@ -15,7 +17,8 @@ message LoginData {
   bool is_active = 8;
   bool is_blocked = 9;
   int32 mail_token = 10;
-  string token = 11;          
+  google.protobuf.StringValue qrcodeurl = 11;
+  string token = 12;          
 }
 
 message LoginRequest {
@@ -27,6 +30,6 @@ message LoginResponse {
   LoginData data = 1;
 }
 
-service AuthService {
+service LoginService {
   rpc Login (LoginRequest) returns (LoginResponse);
 }

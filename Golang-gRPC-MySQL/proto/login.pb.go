@@ -9,6 +9,7 @@ package github_com
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -22,18 +23,19 @@ const (
 )
 
 type LoginData struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	TextContent   string                 `protobuf:"bytes,1,opt,name=text_content,json=textContent,proto3" json:"text_content,omitempty"`
-	FirstName     string                 `protobuf:"bytes,2,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
-	LastName      string                 `protobuf:"bytes,3,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
-	Email         string                 `protobuf:"bytes,4,opt,name=email,proto3" json:"email,omitempty"`
-	Mobile        string                 `protobuf:"bytes,5,opt,name=mobile,proto3" json:"mobile,omitempty"`
-	Username      string                 `protobuf:"bytes,6,opt,name=username,proto3" json:"username,omitempty"`
-	UserPic       string                 `protobuf:"bytes,7,opt,name=user_pic,json=userPic,proto3" json:"user_pic,omitempty"`
-	IsActive      bool                   `protobuf:"varint,8,opt,name=is_active,json=isActive,proto3" json:"is_active,omitempty"`
-	IsBlocked     bool                   `protobuf:"varint,9,opt,name=is_blocked,json=isBlocked,proto3" json:"is_blocked,omitempty"`
-	MailToken     int32                  `protobuf:"varint,10,opt,name=mail_token,json=mailToken,proto3" json:"mail_token,omitempty"`
-	Token         string                 `protobuf:"bytes,11,opt,name=token,proto3" json:"token,omitempty"`
+	state         protoimpl.MessageState  `protogen:"open.v1"`
+	TextContent   string                  `protobuf:"bytes,1,opt,name=text_content,json=textContent,proto3" json:"text_content,omitempty"`
+	FirstName     string                  `protobuf:"bytes,2,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
+	LastName      string                  `protobuf:"bytes,3,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
+	Email         string                  `protobuf:"bytes,4,opt,name=email,proto3" json:"email,omitempty"`
+	Mobile        string                  `protobuf:"bytes,5,opt,name=mobile,proto3" json:"mobile,omitempty"`
+	Username      string                  `protobuf:"bytes,6,opt,name=username,proto3" json:"username,omitempty"`
+	UserPic       string                  `protobuf:"bytes,7,opt,name=user_pic,json=userPic,proto3" json:"user_pic,omitempty"`
+	IsActive      bool                    `protobuf:"varint,8,opt,name=is_active,json=isActive,proto3" json:"is_active,omitempty"`
+	IsBlocked     bool                    `protobuf:"varint,9,opt,name=is_blocked,json=isBlocked,proto3" json:"is_blocked,omitempty"`
+	MailToken     int32                   `protobuf:"varint,10,opt,name=mail_token,json=mailToken,proto3" json:"mail_token,omitempty"`
+	Qrcodeurl     *wrapperspb.StringValue `protobuf:"bytes,11,opt,name=qrcodeurl,proto3" json:"qrcodeurl,omitempty"`
+	Token         string                  `protobuf:"bytes,12,opt,name=token,proto3" json:"token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -136,6 +138,13 @@ func (x *LoginData) GetMailToken() int32 {
 		return x.MailToken
 	}
 	return 0
+}
+
+func (x *LoginData) GetQrcodeurl() *wrapperspb.StringValue {
+	if x != nil {
+		return x.Qrcodeurl
+	}
+	return nil
 }
 
 func (x *LoginData) GetToken() string {
@@ -245,7 +254,7 @@ var File_proto_login_proto protoreflect.FileDescriptor
 
 const file_proto_login_proto_rawDesc = "" +
 	"\n" +
-	"\x11proto/login.proto\x12\x05proto\"\xc0\x02\n" +
+	"\x11proto/login.proto\x12\x05proto\x1a\x1egoogle/protobuf/wrappers.proto\"\xfc\x02\n" +
 	"\tLoginData\x12!\n" +
 	"\ftext_content\x18\x01 \x01(\tR\vtextContent\x12\x1d\n" +
 	"\n" +
@@ -260,14 +269,15 @@ const file_proto_login_proto_rawDesc = "" +
 	"is_blocked\x18\t \x01(\bR\tisBlocked\x12\x1d\n" +
 	"\n" +
 	"mail_token\x18\n" +
-	" \x01(\x05R\tmailToken\x12\x14\n" +
-	"\x05token\x18\v \x01(\tR\x05token\"F\n" +
+	" \x01(\x05R\tmailToken\x12:\n" +
+	"\tqrcodeurl\x18\v \x01(\v2\x1c.google.protobuf.StringValueR\tqrcodeurl\x12\x14\n" +
+	"\x05token\x18\f \x01(\tR\x05token\"F\n" +
 	"\fLoginRequest\x12\x1a\n" +
 	"\busername\x18\x01 \x01(\tR\busername\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\"5\n" +
 	"\rLoginResponse\x12$\n" +
-	"\x04data\x18\x01 \x01(\v2\x10.proto.LoginDataR\x04data2A\n" +
-	"\vAuthService\x122\n" +
+	"\x04data\x18\x01 \x01(\v2\x10.proto.LoginDataR\x04data2B\n" +
+	"\fLoginService\x122\n" +
 	"\x05Login\x12\x13.proto.LoginRequest\x1a\x14.proto.LoginResponseB\x0fZ\r://github.comb\x06proto3"
 
 var (
@@ -284,19 +294,21 @@ func file_proto_login_proto_rawDescGZIP() []byte {
 
 var file_proto_login_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_proto_login_proto_goTypes = []any{
-	(*LoginData)(nil),     // 0: proto.LoginData
-	(*LoginRequest)(nil),  // 1: proto.LoginRequest
-	(*LoginResponse)(nil), // 2: proto.LoginResponse
+	(*LoginData)(nil),              // 0: proto.LoginData
+	(*LoginRequest)(nil),           // 1: proto.LoginRequest
+	(*LoginResponse)(nil),          // 2: proto.LoginResponse
+	(*wrapperspb.StringValue)(nil), // 3: google.protobuf.StringValue
 }
 var file_proto_login_proto_depIdxs = []int32{
-	0, // 0: proto.LoginResponse.data:type_name -> proto.LoginData
-	1, // 1: proto.AuthService.Login:input_type -> proto.LoginRequest
-	2, // 2: proto.AuthService.Login:output_type -> proto.LoginResponse
-	2, // [2:3] is the sub-list for method output_type
-	1, // [1:2] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	3, // 0: proto.LoginData.qrcodeurl:type_name -> google.protobuf.StringValue
+	0, // 1: proto.LoginResponse.data:type_name -> proto.LoginData
+	1, // 2: proto.LoginService.Login:input_type -> proto.LoginRequest
+	2, // 3: proto.LoginService.Login:output_type -> proto.LoginResponse
+	3, // [3:4] is the sub-list for method output_type
+	2, // [2:3] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_proto_login_proto_init() }

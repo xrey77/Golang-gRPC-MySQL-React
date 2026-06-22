@@ -208,8 +208,8 @@ const file_proto_register_proto_rawDesc = "" +
 	"\busername\x18\x05 \x01(\tR\busername\x12\x1a\n" +
 	"\bpassword\x18\x06 \x01(\tR\bpassword\"<\n" +
 	"\x10RegisterResponse\x12(\n" +
-	"\x03msg\x18\x01 \x01(\v2\x16.proto.RegisterMessageR\x03msg2J\n" +
-	"\vAuthService\x12;\n" +
+	"\x03msg\x18\x01 \x01(\v2\x16.proto.RegisterMessageR\x03msg2N\n" +
+	"\x0fRegisterService\x12;\n" +
 	"\bRegister\x12\x16.proto.RegisterRequest\x1a\x17.proto.RegisterResponseB\x0fZ\r://github.comb\x06proto3"
 
 var (
@@ -232,8 +232,8 @@ var file_proto_register_proto_goTypes = []any{
 }
 var file_proto_register_proto_depIdxs = []int32{
 	0, // 0: proto.RegisterResponse.msg:type_name -> proto.RegisterMessage
-	1, // 1: proto.AuthService.Register:input_type -> proto.RegisterRequest
-	2, // 2: proto.AuthService.Register:output_type -> proto.RegisterResponse
+	1, // 1: proto.RegisterService.Register:input_type -> proto.RegisterRequest
+	2, // 2: proto.RegisterService.Register:output_type -> proto.RegisterResponse
 	2, // [2:3] is the sub-list for method output_type
 	1, // [1:2] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name

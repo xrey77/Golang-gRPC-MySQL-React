@@ -14,7 +14,7 @@ message UserProfile {
   string user_pic = 7;
   bool is_active = 8;   
   bool is_blocked = 9;
-  int32 mail_token = 10;
+  string mail_token = 10;
 }
 
 message GetUserRequest {
