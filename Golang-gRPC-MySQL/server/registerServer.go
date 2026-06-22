@@ -56,3 +56,17 @@ func (s *RegisterServer) Register(ctx context.Context, req *proto.RegisterReques
 		},
 	}, nil
 }
+
+/*
+host	 :  grpc://localhost:50051
+endpoint : RegisterService/Register
+request  :
+{
+  "firstname": "Rey",
+  "lastname": "Gragasin",
+  "email": "rey@yahoo.com",
+  "mobile": "1234567890",
+  "username": "Rey",
+  "password": "rey"
+}
+*/

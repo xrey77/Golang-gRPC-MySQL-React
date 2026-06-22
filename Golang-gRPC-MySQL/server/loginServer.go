@@ -118,3 +118,13 @@ func (s *LoginServer) Login(ctx context.Context, req *proto.LoginRequest) (*prot
 	}, nil
 
 }
+
+/*
+host 	 : grpc://localhost:50051
+endpoint : LoginService/Login
+request  :
+{
+  "username": "Rey",
+  "password": "rey"
+}
+*/

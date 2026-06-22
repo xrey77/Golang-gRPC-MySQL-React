@@ -33,9 +33,11 @@ func main() {
 
 	loginServer := &server.LoginServer{DB: db}
 	registerServer := &server.RegisterServer{DB: db}
+	userServer := &server.UserServer{DB: db}
 
 	proto.RegisterRegisterServiceServer(grpcServer, registerServer)
 	proto.RegisterLoginServiceServer(grpcServer, loginServer)
+	proto.RegisterUserServiceServer(grpcServer, userServer)
 
 	reflection.Register(grpcServer)
 

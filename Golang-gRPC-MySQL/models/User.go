@@ -1,7 +1,10 @@
 package models
 
 import (
+	"strconv"
 	"time"
+
+	proto "golang_grpc_mysql/proto"
 
 	"gorm.io/gorm"
 )
@@ -26,4 +29,27 @@ type User struct {
 	Role_id     int       `gorm:"type:integer"`
 
 	Roles []Role `gorm:"many2many:user_roles;"`
+}
+
+// func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
+// 	if u.ID == "" {
+// 		u.ID = uuid.New().String()
+// 	}
+// 	return
+// }
+
+// ToProto converts GORM DB model to Protobuf model
+func (u *User) ToProto() *proto.UserProfile {
+	return &proto.UserProfile{
+		Id:        strconv.Itoa(u.ID),
+		FirstName: u.Firstname,
+		LastName:  u.Lastname,
+		Email:     u.Email,
+		Mobile:    u.Mobile,
+		Username:  u.Username,
+		UserPic:   u.Userpicture,
+		IsActive:  u.Isactivated,
+		IsBlocked: u.Isblocked,
+		MailToken: strconv.FormatInt(int64(u.Mailtoken), 10),
+	}
 }

@@ -25,7 +25,36 @@ message GetUserResponse {
   UserProfile user = 1;
 }
 
+message GetAllUsersRequest {}
+
+message GetAllUsersResponse {
+  repeated UserProfile users = 1;
+}
+
+message UpdateUserProfileRequest {
+  string id = 1;
+  string firstname = 2;
+  string lastname = 3;
+  string mobile = 4;  
+}
+
+message UpdateUserProfileResponse {
+    string text_content = 1;
+}
+
+message ChangePasswordRequest {
+  string id = 1;
+  string password = 2;
+}
+
+message ChangePasswordResponse {
+  string text_content = 1;
+}
+
 
 service UserService {
   rpc GetUser (GetUserRequest) returns (GetUserResponse);
+  rpc GetAllUsers (GetAllUsersRequest) returns (GetAllUsersResponse);
+  rpc UpdateUserProfile(UpdateUserProfileRequest) returns (UpdateUserProfileResponse);
+  rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse);
 }
