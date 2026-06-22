@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "://github.com";
+
+message MfaActivationRequest {
+  string id = 1;
+  bool twofactorenabled = 2;
+}
+
+message MfaActivationResponse {
+  string text_content = 1;
+  string qrcodeurl = 2;
+}
+
+
+message MfaVerifyRequest {
+    string id = 1;
+    string otp = 2;
+}
+
+message MfaVerifyResponse {
+    string text_content = 1;
+    optional string  username = 2;
+}
+
+service MfaService {
+  rpc MfaActivation (MfaActivationRequest) returns (MfaActivationResponse);
+  rpc MfaVerification (MfaVerifyRequest) returns (MfaVerifyResponse);
+}
