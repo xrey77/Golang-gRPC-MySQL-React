@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package proto;
+
+
+option go_package = "golang_grpc_mysql/proto/productv1;productv1";
+
+message ProductData {
+  string id = 1;          
+  string descriptions = 2;
+  string qty = 3;
+  string unit = 4;
+  string product_picture = 5;  
+  string cost_price = 6;
+  string sell_price = 7;  
+}
+
+message GetProductListRequest {
+  int64 page = 1;
+}
+
+message GetProductListResponse {
+  int64 page = 1;
+  int64 total_pages = 2;
+  int64 total_records = 3;
+  repeated  ProductData products = 4;
+}
+
+message GetProductSearchRequest {
+  int64 page = 1;
+  string keyword = 2;
+}
+
+message GetProductSearchResponse {
+  int64 page = 1;
+  int64 total_pages = 2;
+  int64 total_records = 3;
+  repeated ProductData products = 4;
+}
+
+service ProductService {
+  rpc GetProductList (GetProductListRequest) returns (GetProductListResponse);
+  rpc GetProductSearch(GetProductSearchRequest) returns (GetProductSearchResponse);
+}

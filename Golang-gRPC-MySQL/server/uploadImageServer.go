@@ -5,7 +5,7 @@ import (
 	"context"
 	"errors"
 	"golang_grpc_mysql/models"
-	proto "golang_grpc_mysql/proto"
+	uploadProto "golang_grpc_mysql/proto/uploadv1"
 	"os"
 	"path/filepath"
 
@@ -15,11 +15,11 @@ import (
 )
 
 type UploadImageServer struct {
-	proto.UnimplementedUploadPictureServiceServer
+	uploadProto.UnimplementedUploadPictureServiceServer
 	DB *gorm.DB
 }
 
-func (s *UploadImageServer) UploadProfilePicture(ctx context.Context, req *proto.UserPictureRequest) (*proto.UserPictureResponse, error) {
+func (s *UploadImageServer) UploadProfilePicture(ctx context.Context, req *uploadProto.UserPictureRequest) (*uploadProto.UserPictureResponse, error) {
 	if req.GetId() == "" {
 		return nil, status.Error(codes.InvalidArgument, "user ID is required")
 	}
@@ -52,7 +52,7 @@ func (s *UploadImageServer) UploadProfilePicture(ctx context.Context, req *proto
 
 	updateData["userpicture"] = newfile
 	if len(updateData) == 0 {
-		return &proto.UserPictureResponse{
+		return &uploadProto.UserPictureResponse{
 			TextContent: "No changes detected",
 		}, nil
 	}
@@ -67,7 +67,7 @@ func (s *UploadImageServer) UploadProfilePicture(ctx context.Context, req *proto
 		return nil, status.Error(codes.NotFound, "user not found")
 	}
 
-	return &proto.UserPictureResponse{
+	return &uploadProto.UserPictureResponse{
 		TextContent: "Multi-Factor has been enabled successfully.",
 		Userpicture: newfile,
 	}, nil

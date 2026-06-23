@@ -5,8 +5,7 @@ import (
 	"context"
 	"errors"
 	"golang_grpc_mysql/models"
-	proto "golang_grpc_mysql/proto"
-	"net/http"
+	loginProto "golang_grpc_mysql/proto/loginv1"
 	"time"
 
 	"google.golang.org/protobuf/types/known/wrapperspb"
@@ -19,7 +18,7 @@ import (
 )
 
 type LoginServer struct {
-	proto.UnimplementedLoginServiceServer
+	loginProto.UnimplementedLoginServiceServer
 	DB *gorm.DB
 }
 
@@ -29,20 +28,7 @@ type CustomClaims struct {
 	jwt.RegisteredClaims
 }
 
-func mapGRPCCodeToHTTP(code codes.Code) int {
-	switch code {
-	case codes.Unauthenticated:
-		return http.StatusUnauthorized
-	case codes.InvalidArgument:
-		return http.StatusBadRequest
-	case codes.PermissionDenied:
-		return http.StatusForbidden
-	default:
-		return http.StatusInternalServerError
-	}
-}
-
-func (s *LoginServer) Login(ctx context.Context, req *proto.LoginRequest) (*proto.LoginResponse, error) {
+func (s *LoginServer) Login(ctx context.Context, req *loginProto.LoginRequest) (*loginProto.LoginResponse, error) {
 	if req.GetUsername() == "" || req.GetPassword() == "" {
 		return nil, status.Error(codes.InvalidArgument, "username and password are required")
 	}
@@ -100,8 +86,8 @@ func (s *LoginServer) Login(ctx context.Context, req *proto.LoginRequest) (*prot
 		qrcodeurlWrapper = nil
 	}
 
-	return &proto.LoginResponse{
-		Data: &proto.LoginData{
+	return &loginProto.LoginResponse{
+		Data: &loginProto.LoginData{
 			TextContent: "Login successful",
 			FirstName:   user.Firstname,
 			LastName:    user.Lastname,

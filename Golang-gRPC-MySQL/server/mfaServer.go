@@ -6,7 +6,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"golang_grpc_mysql/models"
-	proto "golang_grpc_mysql/proto"
+	mfaProto "golang_grpc_mysql/proto/mfav1"
 
 	"github.com/pquerna/otp/totp"
 	"github.com/skip2/go-qrcode"
@@ -16,11 +16,16 @@ import (
 )
 
 type MfaServer struct {
-	proto.UnimplementedMfaServiceServer
+	mfaProto.UnimplementedMfaServiceServer
 	DB *gorm.DB
 }
 
-func (s *MfaServer) MfaActivation(ctx context.Context, req *proto.MfaActivationRequest) (*proto.MfaActivationResponse, error) {
+func (s *MfaServer) MfaActivation(ctx context.Context, req *mfaProto.MfaActivationRequest) (*mfaProto.MfaActivationResponse, error) {
+	_, err1 := validateToken(ctx)
+	if err1 != nil {
+		return nil, status.Error(codes.Unauthenticated, err1.Error())
+	}
+
 	if req.GetId() == "" {
 		return nil, status.Error(codes.InvalidArgument, "user ID is required")
 	}
@@ -58,7 +63,7 @@ func (s *MfaServer) MfaActivation(ctx context.Context, req *proto.MfaActivationR
 		updateData["secret"] = secret
 		updateData["qrcodeurl"] = string(base64Encoded)
 		if len(updateData) == 0 {
-			return &proto.MfaActivationResponse{
+			return &mfaProto.MfaActivationResponse{
 				TextContent: "No changes detected",
 			}, nil
 		}
@@ -73,7 +78,7 @@ func (s *MfaServer) MfaActivation(ctx context.Context, req *proto.MfaActivationR
 			return nil, status.Error(codes.NotFound, "user not found")
 		}
 
-		return &proto.MfaActivationResponse{
+		return &mfaProto.MfaActivationResponse{
 			TextContent: "Multi-Factor has been enabled successfully.",
 			Qrcodeurl:   string(base64Encoded),
 		}, nil
@@ -82,13 +87,18 @@ func (s *MfaServer) MfaActivation(ctx context.Context, req *proto.MfaActivationR
 
 		updateData["secret"] = nil
 		updateData["qrcodeurl"] = nil
-		return &proto.MfaActivationResponse{
+		return &mfaProto.MfaActivationResponse{
 			TextContent: "Multi-Factor has been disabled successfully.",
 		}, nil
 	}
 }
 
-func (s *MfaServer) MfaVerification(ctx context.Context, req *proto.MfaVerifyRequest) (*proto.MfaVerifyResponse, error) {
+func (s *MfaServer) MfaVerification(ctx context.Context, req *mfaProto.MfaVerifyRequest) (*mfaProto.MfaVerifyResponse, error) {
+	_, err1 := validateToken(ctx)
+	if err1 != nil {
+		return nil, status.Error(codes.Unauthenticated, err1.Error())
+	}
+
 	if req.GetId() == "" {
 		return nil, status.Error(codes.InvalidArgument, "user ID is required")
 	}
@@ -105,7 +115,7 @@ func (s *MfaServer) MfaVerification(ctx context.Context, req *proto.MfaVerifyReq
 		return nil, status.Error(codes.Internal, "Database error")
 	}
 	if user.Secret == "" {
-		return &proto.MfaVerifyResponse{
+		return &mfaProto.MfaVerifyResponse{
 			TextContent: "Multi-Factor Authenticator is not yet activated.",
 		}, nil
 
@@ -114,13 +124,13 @@ func (s *MfaServer) MfaVerification(ctx context.Context, req *proto.MfaVerifyReq
 	valid := totp.Validate(req.GetOtp(), user.Secret)
 	if valid {
 
-		return &proto.MfaVerifyResponse{
+		return &mfaProto.MfaVerifyResponse{
 			TextContent: "OTP code is successfully validated.",
 			Username:    &user.Username,
 		}, nil
 
 	} else {
-		return &proto.MfaVerifyResponse{
+		return &mfaProto.MfaVerifyResponse{
 			TextContent: "Invalid OTP code, please try again.",
 			Username:    nil,
 		}, nil

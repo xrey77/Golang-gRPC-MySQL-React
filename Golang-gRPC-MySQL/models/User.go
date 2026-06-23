@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"time"
 
-	proto "golang_grpc_mysql/proto"
+	proto "golang_grpc_mysql/proto/userv1"
 
 	"gorm.io/gorm"
 )

@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "golang_grpc_mysql/proto/salev1;salev1";
+
+message SalesData {
+  string id = 1;            
+  string sales_amount = 2;
+  string sales_date = 3;
+}
+
+message GetSalesRequest {}
+
+message GetSalesResponse {
+ repeated SalesData data = 1;
+}
+
+service SalesService {
+  rpc GetSales(GetSalesRequest) returns (GetSalesResponse);
+}

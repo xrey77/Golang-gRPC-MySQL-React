@@ -5,7 +5,7 @@ import (
 	"context"
 	"fmt"
 	"golang_grpc_mysql/models"
-	proto "golang_grpc_mysql/proto"
+	registerProto "golang_grpc_mysql/proto/registerv1"
 
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
@@ -14,11 +14,11 @@ import (
 )
 
 type RegisterServer struct {
-	proto.UnimplementedRegisterServiceServer
+	registerProto.UnimplementedAccountServiceServer
 	DB *gorm.DB
 }
 
-func (s *RegisterServer) Register(ctx context.Context, req *proto.RegisterRequest) (*proto.RegisterResponse, error) {
+func (s *RegisterServer) Register(ctx context.Context, req *registerProto.RegisterRequest) (*registerProto.RegisterResponse, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.GetPassword()), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, fmt.Errorf("failed to hash password: %w", err)
@@ -50,8 +50,8 @@ func (s *RegisterServer) Register(ctx context.Context, req *proto.RegisterReques
 		return nil, fmt.Errorf("failed to insert user: %w", result.Error)
 	}
 
-	return &proto.RegisterResponse{
-		Msg: &proto.RegisterMessage{
+	return &registerProto.RegisterResponse{
+		Msg: &registerProto.RegisterMessage{
 			Message: "User registered successfully",
 		},
 	}, nil
