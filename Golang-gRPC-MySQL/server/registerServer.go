@@ -21,13 +21,13 @@ type RegisterServer struct {
 func (s *RegisterServer) Register(ctx context.Context, req *registerProto.RegisterRequest) (*registerProto.RegisterResponse, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.GetPassword()), bcrypt.DefaultCost)
 	if err != nil {
-		return nil, fmt.Errorf("failed to hash password: %w", err)
+		return nil, fmt.Errorf("Failed to hash password: %w", err)
 	}
 
 	var existingUser models.User
 	err = s.DB.WithContext(ctx).Where("email = ?", req.GetEmail()).First(&existingUser).Error
 	if err == nil {
-		return nil, status.Error(codes.AlreadyExists, "email address is already taken.")
+		return nil, status.Error(codes.AlreadyExists, "Email address is already taken.")
 	}
 
 	err = s.DB.WithContext(ctx).Where("username = ?", req.GetUsername()).First(&existingUser).Error
@@ -47,12 +47,12 @@ func (s *RegisterServer) Register(ctx context.Context, req *registerProto.Regist
 
 	result := s.DB.WithContext(ctx).Create(&user)
 	if result.Error != nil {
-		return nil, fmt.Errorf("failed to insert user: %w", result.Error)
+		return nil, fmt.Errorf("Failed to insert user: %w", result.Error)
 	}
 
 	return &registerProto.RegisterResponse{
-		Msg: &registerProto.RegisterMessage{
-			Message: "User registered successfully",
+		Data: &registerProto.RegisterData{
+			TextContent: "You have registered successfully, please login now.",
 		},
 	}, nil
 }

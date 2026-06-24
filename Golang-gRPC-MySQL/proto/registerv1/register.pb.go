@@ -21,27 +21,27 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type RegisterMessage struct {
+type RegisterData struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	TextContent   string                 `protobuf:"bytes,1,opt,name=text_content,json=textContent,proto3" json:"text_content,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *RegisterMessage) Reset() {
-	*x = RegisterMessage{}
+func (x *RegisterData) Reset() {
+	*x = RegisterData{}
 	mi := &file_proto_registerv1_register_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *RegisterMessage) String() string {
+func (x *RegisterData) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*RegisterMessage) ProtoMessage() {}
+func (*RegisterData) ProtoMessage() {}
 
-func (x *RegisterMessage) ProtoReflect() protoreflect.Message {
+func (x *RegisterData) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_registerv1_register_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -53,14 +53,14 @@ func (x *RegisterMessage) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use RegisterMessage.ProtoReflect.Descriptor instead.
-func (*RegisterMessage) Descriptor() ([]byte, []int) {
+// Deprecated: Use RegisterData.ProtoReflect.Descriptor instead.
+func (*RegisterData) Descriptor() ([]byte, []int) {
 	return file_proto_registerv1_register_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *RegisterMessage) GetMessage() string {
+func (x *RegisterData) GetTextContent() string {
 	if x != nil {
-		return x.Message
+		return x.TextContent
 	}
 	return ""
 }
@@ -151,7 +151,7 @@ func (x *RegisterRequest) GetPassword() string {
 
 type RegisterResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Msg           *RegisterMessage       `protobuf:"bytes,1,opt,name=msg,proto3" json:"msg,omitempty"`
+	Data          *RegisterData          `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -186,9 +186,9 @@ func (*RegisterResponse) Descriptor() ([]byte, []int) {
 	return file_proto_registerv1_register_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *RegisterResponse) GetMsg() *RegisterMessage {
+func (x *RegisterResponse) GetData() *RegisterData {
 	if x != nil {
-		return x.Msg
+		return x.Data
 	}
 	return nil
 }
@@ -197,18 +197,18 @@ var File_proto_registerv1_register_proto protoreflect.FileDescriptor
 
 const file_proto_registerv1_register_proto_rawDesc = "" +
 	"\n" +
-	"\x1fproto/registerv1/register.proto\x12\x05proto\"+\n" +
-	"\x0fRegisterMessage\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage\"\xb1\x01\n" +
+	"\x1fproto/registerv1/register.proto\x12\x05proto\"1\n" +
+	"\fRegisterData\x12!\n" +
+	"\ftext_content\x18\x01 \x01(\tR\vtextContent\"\xb1\x01\n" +
 	"\x0fRegisterRequest\x12\x1c\n" +
 	"\tfirstname\x18\x01 \x01(\tR\tfirstname\x12\x1a\n" +
 	"\blastname\x18\x02 \x01(\tR\blastname\x12\x14\n" +
 	"\x05email\x18\x03 \x01(\tR\x05email\x12\x16\n" +
 	"\x06mobile\x18\x04 \x01(\tR\x06mobile\x12\x1a\n" +
 	"\busername\x18\x05 \x01(\tR\busername\x12\x1a\n" +
-	"\bpassword\x18\x06 \x01(\tR\bpassword\"<\n" +
-	"\x10RegisterResponse\x12(\n" +
-	"\x03msg\x18\x01 \x01(\v2\x16.proto.RegisterMessageR\x03msg2M\n" +
+	"\bpassword\x18\x06 \x01(\tR\bpassword\";\n" +
+	"\x10RegisterResponse\x12'\n" +
+	"\x04data\x18\x01 \x01(\v2\x13.proto.RegisterDataR\x04data2M\n" +
 	"\x0eAccountService\x12;\n" +
 	"\bRegister\x12\x16.proto.RegisterRequest\x1a\x17.proto.RegisterResponseB/Z-golang_grpc_mysql/proto/registerv1;registerv1b\x06proto3"
 
@@ -226,12 +226,12 @@ func file_proto_registerv1_register_proto_rawDescGZIP() []byte {
 
 var file_proto_registerv1_register_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_proto_registerv1_register_proto_goTypes = []any{
-	(*RegisterMessage)(nil),  // 0: proto.RegisterMessage
+	(*RegisterData)(nil),     // 0: proto.RegisterData
 	(*RegisterRequest)(nil),  // 1: proto.RegisterRequest
 	(*RegisterResponse)(nil), // 2: proto.RegisterResponse
 }
 var file_proto_registerv1_register_proto_depIdxs = []int32{
-	0, // 0: proto.RegisterResponse.msg:type_name -> proto.RegisterMessage
+	0, // 0: proto.RegisterResponse.data:type_name -> proto.RegisterData
 	1, // 1: proto.AccountService.Register:input_type -> proto.RegisterRequest
 	2, // 2: proto.AccountService.Register:output_type -> proto.RegisterResponse
 	2, // [2:3] is the sub-list for method output_type

@@ -30,29 +30,29 @@ type CustomClaims struct {
 
 func (s *LoginServer) Login(ctx context.Context, req *loginProto.LoginRequest) (*loginProto.LoginResponse, error) {
 	if req.GetUsername() == "" || req.GetPassword() == "" {
-		return nil, status.Error(codes.InvalidArgument, "username and password are required")
+		return nil, status.Error(codes.InvalidArgument, "Username and Password are required.")
 	}
 
 	var user models.User
 	err := s.DB.Where("username = ?", req.GetUsername()).First(&user).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, status.Error(codes.Unauthenticated, "invalid username, please register.")
+			return nil, status.Error(codes.Unauthenticated, "Invalid username, please register.")
 		}
-		return nil, status.Error(codes.Internal, "database error: "+err.Error())
+		return nil, status.Error(codes.Internal, "Database Error : "+err.Error())
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.GetPassword()))
 	if err != nil {
-		return nil, status.Error(codes.Unauthenticated, "invalid password, please try again.")
+		return nil, status.Error(codes.Unauthenticated, "Invalid password, please try again.")
 	}
 
 	if user.Isactivated == false {
-		return nil, status.Error(codes.PermissionDenied, "user account is not yet activated.")
+		return nil, status.Error(codes.PermissionDenied, "User account is not yet activated.")
 	}
 
 	if user.Isblocked == true {
-		return nil, status.Error(codes.PermissionDenied, "user account is blocked")
+		return nil, status.Error(codes.PermissionDenied, "User account has been blocked.")
 	}
 	var jwtSecretKey = []byte("f7bc028ed2f6c641f173b120688339f9")
 	expirationTime := time.Now().Add(24 * time.Hour)
@@ -70,7 +70,7 @@ func (s *LoginServer) Login(ctx context.Context, req *loginProto.LoginRequest) (
 
 	generatedToken, err := token.SignedString(jwtSecretKey)
 	if err != nil {
-		return nil, status.Error(codes.Internal, "failed to generate token")
+		return nil, status.Error(codes.Internal, "Failed to generate token.")
 	}
 
 	var qrcodeurlWrapper *wrapperspb.StringValue
@@ -88,7 +88,7 @@ func (s *LoginServer) Login(ctx context.Context, req *loginProto.LoginRequest) (
 
 	return &loginProto.LoginResponse{
 		Data: &loginProto.LoginData{
-			TextContent: "Login successful",
+			TextContent: "Login successful, please wait.",
 			FirstName:   user.Firstname,
 			LastName:    user.Lastname,
 			Email:       user.Email,

@@ -6,21 +6,20 @@ import "google/protobuf/wrappers.proto";
 
 option go_package = "golang_grpc_mysql/proto/loginv1;loginv1";
 
-
-
 message LoginData {
   string text_content = 1;
-  string first_name = 2;
-  string last_name = 3;
-  string email = 4;
-  string mobile = 5;
-  string username = 6;
-  string user_pic = 7;
-  bool is_active = 8;
-  bool is_blocked = 9;
-  int32 mail_token = 10;
-  google.protobuf.StringValue qrcodeurl = 11;
-  string token = 12;          
+  string id = 2;
+  string first_name = 3;
+  string last_name = 4;
+  string email = 5;
+  string mobile = 6;
+  string username = 7;
+  string user_pic = 8;
+  bool is_active = 9;
+  bool is_blocked = 10;
+  int32 mail_token = 11;
+  google.protobuf.StringValue qrcodeurl = 12;
+  string token = 13;
 }
 
 message LoginRequest {

@@ -21,8 +21,11 @@ require (
 )
 
 require (
+	connectrpc.com/connect v1.20.0 // indirect
+	github.com/bufbuild/connect-go v1.10.0 // indirect
 	github.com/bytedance/gopkg v0.1.3 // indirect
 	go.mongodb.org/mongo-driver/v2 v2.5.0 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20260622175928-b703f567277d // indirect
 )
 
 require (
@@ -64,6 +67,6 @@ require (
 	golang.org/x/sys v0.45.0 // indirect
 	golang.org/x/text v0.37.0 // indirect
 	golang.org/x/tools v0.44.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260610212136-7ab31c22f7ad // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260618152121-87f3d3e198d3 // indirect
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.6.1 // indirect
 )

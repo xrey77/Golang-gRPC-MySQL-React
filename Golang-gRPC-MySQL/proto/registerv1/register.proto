@@ -4,9 +4,8 @@ package proto;
 
 option go_package = "golang_grpc_mysql/proto/registerv1;registerv1";
 
-
-message RegisterMessage {
-    string message = 1;
+message RegisterData {
+    string text_content = 1;
 }
 
 message RegisterRequest {
@@ -19,7 +18,7 @@ message RegisterRequest {
 }
 
 message RegisterResponse {
-    RegisterMessage msg = 1;
+    RegisterData data = 1;
 }
 
 service AccountService {

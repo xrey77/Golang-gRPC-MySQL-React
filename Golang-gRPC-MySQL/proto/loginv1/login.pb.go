@@ -7,12 +7,13 @@
 package loginv1
 
 import (
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
+
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 const (
@@ -25,6 +26,7 @@ const (
 type LoginData struct {
 	state         protoimpl.MessageState  `protogen:"open.v1"`
 	TextContent   string                  `protobuf:"bytes,1,opt,name=text_content,json=textContent,proto3" json:"text_content,omitempty"`
+	Id            int32                   `protobuf:"varint,10,opt,name=id,json=id,proto3" json:"id,omitempty"`
 	FirstName     string                  `protobuf:"bytes,2,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
 	LastName      string                  `protobuf:"bytes,3,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
 	Email         string                  `protobuf:"bytes,4,opt,name=email,proto3" json:"email,omitempty"`
