@@ -33,6 +33,7 @@ type UserProfile struct {
 	IsActive      bool                   `protobuf:"varint,8,opt,name=is_active,json=isActive,proto3" json:"is_active,omitempty"`
 	IsBlocked     bool                   `protobuf:"varint,9,opt,name=is_blocked,json=isBlocked,proto3" json:"is_blocked,omitempty"`
 	MailToken     string                 `protobuf:"bytes,10,opt,name=mail_token,json=mailToken,proto3" json:"mail_token,omitempty"`
+	Qrcodeurl     string                 `protobuf:"bytes,11,opt,name=qrcodeurl,proto3" json:"qrcodeurl,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -133,6 +134,13 @@ func (x *UserProfile) GetIsBlocked() bool {
 func (x *UserProfile) GetMailToken() string {
 	if x != nil {
 		return x.MailToken
+	}
+	return ""
+}
+
+func (x *UserProfile) GetQrcodeurl() string {
+	if x != nil {
+		return x.Qrcodeurl
 	}
 	return ""
 }
@@ -517,7 +525,7 @@ var File_userv1_user_proto protoreflect.FileDescriptor
 
 const file_userv1_user_proto_rawDesc = "" +
 	"\n" +
-	"\x11userv1/user.proto\x12\x05proto\"\x99\x02\n" +
+	"\x11userv1/user.proto\x12\x05proto\"\xb7\x02\n" +
 	"\vUserProfile\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -532,7 +540,8 @@ const file_userv1_user_proto_rawDesc = "" +
 	"is_blocked\x18\t \x01(\bR\tisBlocked\x12\x1d\n" +
 	"\n" +
 	"mail_token\x18\n" +
-	" \x01(\tR\tmailToken\" \n" +
+	" \x01(\tR\tmailToken\x12\x1c\n" +
+	"\tqrcodeurl\x18\v \x01(\tR\tqrcodeurl\" \n" +
 	"\x0eGetUserRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"9\n" +
 	"\x0fGetUserResponse\x12&\n" +

@@ -1,108 +1,109 @@
-import axios from 'axios';
 import { useState } from 'react';
+import { ConnectError, createClient } from "@connectrpc/connect";
+import { createConnectTransport } from "@connectrpc/connect-web";
+import { ProductService } from '../schema/productv1/product_pb';
+import { type ProductData } from '../schema/productv1/product_pb';
 
-const api = axios.create({
-  baseURL: "http://localhost:5000",
-  headers: {'Accept': 'application/json',
-            'Content-Type': 'application/json'}
-})
+const transport = createConnectTransport({
+  baseUrl: "http://localhost:8080",
+});
 
-const toDecimal = (number: any) => {
+const productClient = createClient(ProductService, transport);
+
+
+const toDecimal = (amt: string) => {
   const formatter = new Intl.NumberFormat('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
-  return formatter.format(number);
+  const price = parseFloat(amt);
+  return formatter.format(price);
 };
 
 
 export default function Prodsearch() {
-  let [message, setMessage] = useState('');
-  let [prodsearch, setProdsearch] = useState<[]>([]);
-  let [page, setPage] = useState<number>(1);
-  let [totpage, setTotpage] = useState<number>(0);
-  let [totalrecords, setTotalrecords] = useState<number>(0);
-  let [searchkey, setSearchkey] = useState<string>('');
+    const [page, setPage] = useState<bigint>(1n);
+    const [totpage, setTotpage] = useState<bigint>(0n);
+    const [totalrecs, setTotalrecs] = useState<bigint>(0n);
+    const [message, setMessage] = useState<string>('');
+    const [products, setProducts] = useState<ProductData[]>([]);
 
-  const getProdsearch = async (event: any) => {
+  const [searchkey, setSearchkey] = useState<string>('');
+
+  const getProdsearch = async (event: React.SubmitEvent<HTMLFormElement>) => { 
       event.preventDefault();
+      getProdPage(page);
       setMessage("please wait .");
-      await api.get(`/products/search/${page}/${searchkey}`)
-      .then((res: any) => {
-          setProdsearch(res.data.products);
-          setTotpage(res.data.totpage);
-          setTotalrecords(res.data.totalrecords)
-          setPage(res.data.page);
-          setTimeout(() => {
-            setMessage('');
-          }, 1000);
-
-      }, (error: any) => {     
-        setMessage(error.response.data.message);
-        setProdsearch([]);
-        setTimeout(() => {
-            setMessage('');
-        }, 3000);
-          return;
-      });  
   }
 
-  const getProdPage = async (page: number) => {
-    setMessage("please wait .");
-    await api.get(`/api/products/search/${page}/${searchkey}`)
-    .then((res: any) => {
-        setProdsearch(res.data.products);
-        setTotpage(res.data.totpage);
-        setPage(res.data.page);
-        setTimeout(() => {
-          setMessage('');
-        }, 1000);
+  const getProdPage = async (pg: bigint) => {
+        try {
+            const response = await productClient.getProductSearch(
+                {               
+                  page: BigInt(pg),
+                  keyword: searchkey
+                }
+            );
+            setProducts(response.products);
+            setPage(response.page);
+            setTotpage(response.totalPages);
+            
+            setTotalrecs(response.totalRecords);
+            
 
+        } catch (err) {
 
-    }, (error: any) => {        
-      setMessage(error.response.data.message);
-      setProdsearch([]);
-      setTimeout(() => {
-          setMessage('');
-      }, 3000);
-        return;
-    });  
+            const connectErr = ConnectError.from(err);
+            console.log(ConnectError);
+            const cleanMessage = connectErr.rawMessage.includes("desc = ")
+            ? connectErr.rawMessage.split("desc = ")[1]
+            : connectErr.rawMessage;
+            setMessage(cleanMessage);
+            setTimeout(() => {
+              setMessage('');
+            }, 3000);
+        }
 }
 
-  const firstPage = (event: any) => {
-    event.preventDefault();    
-    page = 1;
-    return getProdPage(page);
-  }
-
-  const nextPage = (event: any) => {
-    event.preventDefault();    
-    if (page == totpage) {
-        page = 0;
-        setPage(totpage);
-        return;
-    } else {
-      page++;
-      return getProdPage(page);  
-    }
-  }
-
-  const prevPage = (event: any) => {
-    event.preventDefault();    
-    if (page === 1) {
-      setPage(1);
-      return;
+    const firstPage = (event: React.MouseEvent<HTMLAnchorElement>) => { 
+        event.preventDefault();
+        getProdPage(1n);  
+        return;    
       }
-      page--;
-      return getProdPage(page);
-  }
+    
+      const nextPage = (event: React.MouseEvent<HTMLAnchorElement>) => {
+        event.preventDefault();    
+        if (page == totpage) {
+            setPage(totpage);
+            return;
+        }
+        let pg: bigint = page;
+        pg++;
+        setPage(pg);
+        return getProdPage(pg);
+      }
+    
+      const prevPage = (event: React.MouseEvent<HTMLAnchorElement>) => {
+        event.preventDefault();    
+        if (page === 1n) {
+          return;
+          }
+          let pg: bigint = page;
+          pg--;
+          setPage(pg);
+          return getProdPage(pg);
+      }
+    
+      const lastPage = (event: React.MouseEvent<HTMLAnchorElement>) => {
+        event.preventDefault();
+        const pg = totpage;
+        setPage(pg);
+        return getProdPage(pg);
+      }  
+  
 
-  const lastPage = (event: any) => {
-    event.preventDefault();
-    page = totpage;
-    return getProdPage(page);
-  }  
-   
+  
+
 return (
   <div className="container mb-10">
       <h2 className='text-warning embossed mt-3'>Products Search</h2>
@@ -119,17 +120,17 @@ return (
       </form>
       <div className="container mb-9">
         <div className="card-group">
-      {prodsearch.map((item) => {
+      {products.map((item) => {
               return (
               <div className='col-md-4'>
               <div key={item['id']} className="card mx-3 mt-3">
-                  <img src={`http://localhost:5000/assets/products/${item['productpicture']}`} className="card-img-top product-size" alt=""/>
+                  <img src={`http://localhost:8080/assets/products/${item['productPicture']}`} className="card-img-top product-size" alt=""/>
                   <div className="card-body">
                     <h5 className="card-title">Descriptions</h5>
                     <p className="card-text desc-h">{item['descriptions']}</p>
                   </div>
                   <div className="card-footer">
-                    <p className="card-text text-danger"><span className="text-dark">PRICE :</span>&nbsp;<strong>&#8369;{toDecimal(item['sellprice'])}</strong></p>
+                    <p className="card-text text-danger"><span className="text-dark">PRICE :</span>&nbsp;<strong>&#8369;{toDecimal(item['sellPrice'])}</strong></p>
                   </div>  
               </div>
               
@@ -149,7 +150,7 @@ return (
               <li className="page-item page-link text-danger sm">Page&nbsp;{page} of&nbsp;{totpage}</li>
             </ul>
           </nav>
-          <div className='text-warning'><strong>Total Records : {totalrecords}</strong></div>
+          <div className='text-warning'><strong>Total Records : {totalrecs}</strong></div>
           </>
         :
         null

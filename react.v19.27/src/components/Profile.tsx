@@ -1,21 +1,30 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from "react";
 import jQuery from 'jquery';
+import { ConnectError, createClient } from "@connectrpc/connect";
+import { createConnectTransport } from "@connectrpc/connect-web";
+import { UserService } from "../schema/userv1/user_pb"; 
+import { MfaService } from "../schema/mfav1/mfa_pb";
+import { UploadPictureService } from "../schema/uploadv1/uploadImage_pb";
 
-const mfaapi = axios.create({
-  baseURL: "http://localhost:5000",
-  headers: {'Accept': 'application/json',
-            'Content-Type': 'application/json',}
-})
+const transport = createConnectTransport({
+  baseUrl: "http://localhost:8080",
+  interceptors: [
+    (next) => async (req) => {
+      const token = sessionStorage.getItem('TOKEN');
+      if (token) {
+        req.header.set("Authorization", `Bearer ${token}`);
+      }
+      return await next(req);
+    },
+  ],
+});
 
-const api = axios.create({
-  baseURL: "http://localhost:5000",
-  headers: {'Accept': 'application/json',
-          'Content-Type': 'multipart/form-data',}
-})
+const userclient = createClient(UserService, transport);
+const mfaClient = createClient(MfaService, transport);
+const uploadClient = createClient(UploadPictureService, transport);
 
 export default function Profile() {    
-    const [userid, setUserid] = useState<string>('');;
+    const [userid, setUserid] = useState<string>("");;
     const [lname, setLname] = useState<string>('');
     const [fname, setFname] = useState<string>('');
     const [email, setEmail] = useState<string>('');
@@ -28,122 +37,128 @@ export default function Profile() {
     const [showmfa, setShowMfa] = useState<boolean>(false);
     const [showpwd, setShowPwd] = useState<boolean>(false);
     const [showupdate, setShowUpdate] = useState<boolean>(false);
-    // const [qrcodeurl, setQrcodeurl] = useState<Blob>(new Blob());
     const [qrcodeurl, setQrcodeurl] = useState<string>('');
 
-    const fetchUserData = (id: any, token: any) => {
-        mfaapi.get(`api/getuserid/${id}`,{headers: {
-            Authorization: `Bearer ${token}`
-        }})
-        .then((res: any) => {
-            setLname(res.data[0].lastname); 
-            setFname(res.data[0].firstname); 
-            setEmail(res.data[0].email);
-            setMobile(res.data[0].mobile);
-            let userpic: string = `http://localhost:5000/assets/users/${res.data[0].userpicture}`;
-            setUserpicture(userpic);
-            setQrcodeurl(res.data[0].qrcodeurl);     
-
-            if (res.data[0].qrcodeurl !== null) {
-                let qrcode: any = 'data:image/png;base64,' + res.data[0].qrcodeurl
-                setQrcodeurl(qrcode);
-                // jQuery('#googleAuth').attr('src', qrcode);
-
-            } else {
-                setQrcodeurl('http://127.0.0.1:5000/assets/images/qrcode.png');
-            }
-
-        }, (error: any) => {
-            if (error.response) {
-                setProfileMsg(error.response.data.message);            
-            } else {
-                setProfileMsg(error.message);
-            }
-            setTimeout(() => {
-                setProfileMsg('')
-            }, 3000);
-        });
-    };    
-
     useEffect(() => {
-        jQuery("#password").prop('disabled', true);
-
-        const userId = sessionStorage.getItem('USERID');
-        if (userId !== null) {
-            setUserid(userId)
-        } else {
-            setUserid('')
-        }
-        const xtoken = sessionStorage.getItem('TOKEN');
-        if (xtoken !== null) {
-            setToken(xtoken);
-        } else {
-            setToken('');
-        }
-        setProfileMsg('please wait..');
-        fetchUserData(userId, xtoken);    
-        setTimeout(() => {
-            setProfileMsg('');
-        }, 2000);
-    },[]) 
-
-    const submitProfile = (event: any) => {
-        event.preventDefault();
-        const jsondata =JSON.stringify({firstname: fname, lastname: lname, mobile: mobile });
-        mfaapi.patch(`api/updateprofile/${userid}`, jsondata, { headers: {
-            Authorization: `Bearer ${token}`
-        }})
-        .then((res: any) => {
-            setProfileMsg(res.data.message);
-            setTimeout(() => {
-                setProfileMsg('');
-            },3000);
-            return;
-        }, (error: any) => {
-            if (error.response) {
-                setProfileMsg(error.response.data.message);            
-            } else {
-                setProfileMsg(error.message);
-            }                      
-            setTimeout(() => {
-                setProfileMsg('');
-            },3000);
-            return;
+        const xidno = sessionStorage.getItem('USERID') || '';
+        const xtoken = sessionStorage.getItem('TOKEN') || '';
+        queueMicrotask(() => {
+            setUserid(xidno !== null ? xidno : '')
+            setToken(xtoken !== null ? xtoken : '');
         });
-    }
+        const fetchUserData = async () => {
+            try {
+                const response = await userclient.getUser(
+                    { 
+                        id: xidno 
+                    }
+                    // { 
+                    //     headers: { 
+                    //         Authorization: `Bearer ${token}`,
+                    //     }
+                    // }
+                );
 
-    const changePicture = (event: any) => {
+                const userpic = `http://localhost:8080/assets/users/${response.user?.userPic}`;
+                const qrcode = response.user?.qrcodeurl ?? '';
+                setQrcodeurl(qrcode)
+                const f_name = response.user?.firstName ?? '';
+                const l_name = response.user?.lastName ?? '';
+                const l_email = response.user?.email ?? '';
+                const mobileno = response.user?.mobile ?? '';
+                setFname(f_name);
+                setLname(l_name);
+                setEmail(l_email)
+                setMobile(mobileno);
+                setUserpicture(userpic);
+                setQrcodeurl(qrcode);
+
+            } catch (err) {
+                const connectErr = ConnectError.from(err);
+                console.log(ConnectError);
+                const cleanMessage = connectErr.rawMessage.includes("desc = ")
+                ? connectErr.rawMessage.split("desc = ")[1]
+                : connectErr.rawMessage;
+                setProfileMsg(cleanMessage);
+            }
+        };
+
+        fetchUserData();
+
+    }, [userid, token]);
+
+    const submitProfile = async (event: React.MouseEvent<HTMLButtonElement>) => {  
         event.preventDefault();
-            var pix = URL.createObjectURL(event.target.files[0]);
-            jQuery('#userpic').attr('src', pix);
-            const formData = new FormData();
-            formData.append('userpic', event.target.files[0]);
-            api.patch(`api/uploadpicture/${userid}`, formData, {headers: {
-                Authorization: `Bearer ${token}`
-            }})
-            .then((res: any) => {
-                setProfileMsg(res.data.message);
-                setTimeout(() => {
-                    let userpic: string = `http://localhost:5000/assets/users/${res.data.userpic}`;
-                    sessionStorage.setItem('USERPIC', userpic)
-                    setProfileMsg('');
-                    location.reload();
-                },3000);
-                return;
-            }, (error: any) => {
-                if (error.response) {
-                    setProfileMsg(error.response.data.message);            
-                } else {
-                    setProfileMsg(error.message);
-                }                    
-                setTimeout(() => {
-                    setProfileMsg('');
-                },3000);
-                return;
-            });
+        try {
+            const response = await userclient.updateUserProfile(
+                { 
+                    id: userid,
+                    firstname: fname,
+                    lastname: lname,
+                    mobile: mobile
+                }
+                // { 
+                //     headers: { 
+                //         Authorization: `Bearer ${token}`,
+                //     }
+                // }
+            );
+            setProfileMsg(response.textContent ?? '');
+            setTimeout(() => { setProfileMsg(''); }, 3000);
+        } catch (err) {
+            const connectErr = ConnectError.from(err);
+            console.log(ConnectError);
+            const cleanMessage = connectErr.rawMessage.includes("desc = ")
+            ? connectErr.rawMessage.split("desc = ")[1]
+            : connectErr.rawMessage;
+            setProfileMsg(cleanMessage);
+            setTimeout(() => { setProfileMsg(''); }, 3000);
+        }
     }
 
-    const cpwdCheckbox = (e: any) => {
+    const changePicture = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        event.preventDefault();
+        const files = event.target.files;
+        if (!files || files.length === 0) return;
+
+        const file = files[0];
+        const pix = URL.createObjectURL(file);
+        jQuery('#userpic').attr('src', pix);
+
+        // Read file as Uint8Array for gRPC transmission
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            if (!e.target?.result) return;
+            
+            const arrayBuffer = e.target.result as ArrayBuffer;
+            const fileBytes = new Uint8Array(arrayBuffer);
+
+            try {
+                const response = await uploadClient.uploadProfilePicture({ 
+                    id: userid,
+                    fileData: fileBytes,
+                    filename: file.name
+                });
+                
+                setProfileMsg(response.textContent ?? '');
+                const userpic = `http://localhost:8080/assets/users/${response.userpicture}`;
+                setUserpicture(userpic);
+                setTimeout(() => { setProfileMsg(''); }, 3000);
+            } catch (err) {
+                const connectErr = ConnectError.from(err);
+                const cleanMessage = connectErr.rawMessage.includes("desc = ")
+                    ? connectErr.rawMessage.split("desc = ")[1]
+                    : connectErr.rawMessage;
+                setProfileMsg(cleanMessage);
+                setTimeout(() => { setProfileMsg(''); }, 3000);
+            }
+        };
+        
+        reader.readAsArrayBuffer(file);
+    }
+
+
+    const cpwdCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.checked) {
             setShowUpdate(true);
             setShowPwd(true);
@@ -158,68 +173,80 @@ export default function Profile() {
         }
     }
 
-    const mfaCheckbox = (e: any) => {
+    const mfaCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.checked) {
             setShowMfa(true);
             setShowUpdate(true)
             setShowPwd(false);
-            jQuery('#checkChangePassword').prop('checked', false);
+            if (qrcodeurl.length > 0) {
+                const qrcode = qrcodeurl;
+                setQrcodeurl(qrcode);
+            } else {
+                setQrcodeurl("http://localhost:8080/assets/images/qrcode.png");
+            }
         } else {
             setShowMfa(false);
             setShowUpdate(false)
         }
     }
 
-    const enableMFA = () => {
-        const data =JSON.stringify({TwoFactorEnabled: true });
-        mfaapi.patch(`api/mfa/activate/${userid}`, data, {headers: {
-            Authorization: `Bearer ${token}`
-        }})
-        .then((res: any) => {
-            setProfileMsg(res.data.message);
-            setTimeout(() => {
-                let qrcode: any = 'data:image/png;base64,' + res.data.qrcodeurl
-                setQrcodeurl(qrcode);
-                setProfileMsg('');
-            },3000);
-        }, (error: any) => {
-            if (error.response) {
-                setProfileMsg(error.response.data.message);            
-            } else {
-                setProfileMsg(error.message);
-            }
-            setTimeout(() => {
-                setProfileMsg('');
-            },3000);
-            return;
-        });
+    const enableMFA = async () => {
+        try {
+            const response = await mfaClient.mfaActivation(
+                { 
+                    id: userid,
+                    twofactorenabled: true
+                }
+                // { 
+                //     headers: { 
+                //         Authorization: `Bearer ${token}`,
+                //     }
+                // }
+            );
+            setProfileMsg(response.textContent ?? '');
+            setQrcodeurl(response.qrcodeurl ?? '');
+            setTimeout(() => { setProfileMsg(''); }, 3000);
+        } catch (err) {
+            const connectErr = ConnectError.from(err);
+            console.log(ConnectError);
+            const cleanMessage = connectErr.rawMessage.includes("desc = ")
+            ? connectErr.rawMessage.split("desc = ")[1]
+            : connectErr.rawMessage;
+            setProfileMsg(cleanMessage);
+            setTimeout(() => { setProfileMsg(''); }, 3000);
+        }
     }
 
-    const disableMFA = () => {
-        const jsonData =JSON.stringify({TwoFactorEnabled: false });      
-        mfaapi.patch(`api/mfa/activate/${userid}`, jsonData, {headers: {
-            Authorization: `Bearer ${token}`
-        }})
-        .then((res: any) => {
-            setProfileMsg(res.data.message);
-            setQrcodeurl('http://127.0.0.1:5000/assets/images/qrcode.png');                
-            setTimeout(() => {
-                setProfileMsg('');
-            },3000);
-        }, (error: any) => {
-            if (error.response) {
-                setProfileMsg(error.response.data.message);            
-            } else {
-                setProfileMsg(error.message);
-            }
-            setTimeout(() => {
-                setProfileMsg('');
-            },3000);
-            return;
-        });
+    const disableMFA = async () => {
+        try {
+            const response = await mfaClient.mfaActivation(
+                { 
+                    id: userid,
+                    twofactorenabled: false
+                }
+                // { 
+                //     headers: { 
+                //         Authorization: `Bearer ${token}`,
+                //     }
+                // }
+            );
+            setProfileMsg(response.textContent ?? '');
+            const qrcode = "http://localhost:8080/assets/images/qrcode.png";
+            setQrcodeurl(qrcode);
+            setTimeout(() => { setProfileMsg(''); }, 3000);
+        } catch (err) {
+            const connectErr = ConnectError.from(err);
+            console.log(ConnectError);
+            const cleanMessage = connectErr.rawMessage.includes("desc = ")
+            ? connectErr.rawMessage.split("desc = ")[1]
+            : connectErr.rawMessage;
+            setProfileMsg(cleanMessage);
+            setTimeout(() => { setProfileMsg(''); }, 3000);
+        }
+
     }
 
-    const changePassword = (event: any) => {
+    const changePassword = async (event: React.MouseEvent<HTMLButtonElement>) => {  
         event.preventDefault();
         if (newpassword === '') {
             setProfileMsg("Please enter new Pasword.");
@@ -243,31 +270,35 @@ export default function Profile() {
             },3000);
             return;            
         }
-
-        const jsonData =JSON.stringify({password: newpassword });
-        mfaapi.patch(`api/changepassword/${userid}`, jsonData, {headers: {
-            Authorization: `Bearer ${token}`
-        }})
-        .then((res: any) => {
-                console.log(res.data);
-                setProfileMsg(res.data.message);
-                setTimeout(() => {
-                    setProfileMsg('');
-                },3000);
-                return;
-        }, (error: any) => {
-            if (error.response) {
-                setProfileMsg(error.response.data.message);            
-            } else {
-                setProfileMsg(error.message);
+            try {
+                const response = await client.changePassword(
+                    { 
+                        id: userid,
+                        password: newpassword
+                    }
+                    // { 
+                    //     headers: { 
+                    //         Authorization: `Bearer ${token}`,
+                    //     }
+                    // }
+                );
+                setProfileMsg(response.textContent ?? '');
+                setTimeout(() => { setProfileMsg(''); }, 3000);
+            } catch (err) {
+                const connectErr = ConnectError.from(err);
+                console.log(ConnectError);
+                const cleanMessage = connectErr.rawMessage.includes("desc = ")
+                ? connectErr.rawMessage.split("desc = ")[1]
+                : connectErr.rawMessage;
+                setProfileMsg(cleanMessage);
+                setTimeout(() => { setProfileMsg(''); }, 3000);
             }
-            setTimeout(() => {
-                setProfileMsg('');
-            },3000);
-            return;
-        });        
+
+
     }
 
+    // if (error) return <div>Error: {error}</div>;
+    // if (!userState) return null;    
     return (
       <div className='profile-bg'>
         <div className="card card-profile mt-3">
@@ -317,7 +348,7 @@ export default function Profile() {
                                 showmfa === true ? (
                                     <div className='row'>
                                         <div className='col-5'>
-                                            <img id="googleAuth" src={qrcodeurl} className="qrCode2" alt="QRCODE" />
+                                            <img src={qrcodeurl} className="qrCode2" alt="QRCODE" />
                                         </div>
                                         <div className='col-7   '>
                                             <p className='text-danger mfa-pos-1'><strong>Requirements</strong></p>

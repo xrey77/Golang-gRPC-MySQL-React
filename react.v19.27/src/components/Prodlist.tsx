@@ -1,82 +1,135 @@
-import axios from 'axios';
 import { useState, useEffect } from 'react';
+import { ConnectError, createClient } from "@connectrpc/connect";
+import { createConnectTransport } from "@connectrpc/connect-web";
+import { ProductService } from '../schema/productv1/product_pb';
+import { type ProductData } from '../schema/productv1/product_pb';
 
-const api = axios.create({
-  baseURL: "http://localhost:5000",
-  headers: {'Accept': 'application/json',
-            'Content-Type': 'application/json'}
-})
+const transport = createConnectTransport({
+  baseUrl: "http://localhost:8080",
+});
 
+const productClient = createClient(ProductService, transport);
 
 export default function Prodlist() {
 
-  const toDecimal = (number: any) => {
+  const toDecimal = (amt: string) => {
     const formatter = new Intl.NumberFormat('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
-    return formatter.format(number);
+    const price = parseFloat(amt);
+    return formatter.format(price);
   };
 
-    let [page, setPage] = useState<number>(1);
-    let [totpage, setTotpage] = useState<number>(0);
-    let [totalrecs, setTotalrecs] = useState<number>(0);
 
-    let [products, setProducts] = useState<[]>([]);
+    const [page, setPage] = useState<bigint>(1n);
+    const [totpage, setTotpage] = useState<bigint>(0n);
+    const [totalrecs, setTotalrecs] = useState<bigint>(0n);
+    const [message, setMessage] = useState<string>('');
+    const [products, setProducts] = useState<ProductData[]>([]);
 
-    const fetchProducts = (pg: any) => {
-      api.get(`/products/list/${pg}`)
-      .then((res: any) => {
-        setProducts(res.data.products);
-        setTotpage(res.data.totpage);
-        setTotalrecs(res.data.totalrecords);
-        setPage(res.data.page);
-      }, (error: any) => {
-              console.log(error.response.data.message);
-              return;
-      });      
+    const fetchProds = async (pg: bigint) => {
+        try {
+            const response = await productClient.getProductList(
+                {               
+                  page: BigInt(pg)
+                }
+            );
+            setProducts(response.products);
+            setPage(response.page);
+            setTotpage(response.totalPages);
+            
+            setTotalrecs(response.totalRecords);
+            
+
+        } catch (err) {
+
+            const connectErr = ConnectError.from(err);
+            console.log(ConnectError);
+            const cleanMessage = connectErr.rawMessage.includes("desc = ")
+            ? connectErr.rawMessage.split("desc = ")[1]
+            : connectErr.rawMessage;
+            setMessage(cleanMessage);
+            setTimeout(() => {
+              setMessage('');
+            }, 3000);
+        }
     }
 
+
     useEffect(() => {
+      const fetchProducts = async (pg: bigint) => {
+          try {
+              const response = await productClient.getProductList(
+                  {               
+                    page: BigInt(pg)
+                  }
+              );
+              setProducts(response.products);
+              setPage(response.page);
+              setTotpage(response.totalPages);
+              
+              setTotalrecs(response.totalRecords);
+              
+
+          } catch (err) {
+
+              const connectErr = ConnectError.from(err);
+              console.log(ConnectError);
+              const cleanMessage = connectErr.rawMessage.includes("desc = ")
+              ? connectErr.rawMessage.split("desc = ")[1]
+              : connectErr.rawMessage;
+              setMessage(cleanMessage);
+              setTimeout(() => {
+                setMessage('');
+              }, 3000);
+          }
+
+      }
+
       fetchProducts(page);
    },[page]);
 
-    const firstPage = (event: any) => {
-        event.preventDefault();    
-        page = 1;
-        fetchProducts(page);
+    const firstPage = (event: React.MouseEvent<HTMLAnchorElement>) => { 
+        event.preventDefault();
+        fetchProds(1n);  
         return;    
       }
     
-      const nextPage = (event: any) => {
+      const nextPage = (event: React.MouseEvent<HTMLAnchorElement>) => {
         event.preventDefault();    
         if (page == totpage) {
             setPage(totpage);
             return;
         }
-        page++;
-        return fetchProducts(page);
+        let pg: bigint = page;
+        pg++;
+        setPage(pg);
+        return fetchProds(pg);
       }
     
-      const prevPage = (event: any) => {
+      const prevPage = (event: React.MouseEvent<HTMLAnchorElement>) => {
         event.preventDefault();    
-        if (page === 1) {
+        if (page === 1n) {
           return;
           }
-          page--;
-          return fetchProducts(page);
+          let pg: bigint = page;
+          pg--;
+          setPage(pg);
+          return fetchProds(pg);
       }
     
-      const lastPage = (event: any) => {
+      const lastPage = (event: React.MouseEvent<HTMLAnchorElement>) => {
         event.preventDefault();
-        page = totpage;
-        return fetchProducts(page);
+        const pg = totpage;
+        setPage(pg);
+        return fetchProds(pg);
       }  
   
   return (
     <div className="container">
             <h1 className='text-warning embossed mt-3'>Products List</h1>
-
+            <div>{message}</div>
             <table className="table table-danger table-striped">
             <thead>
                 <tr>
@@ -96,7 +149,7 @@ export default function Prodlist() {
                  <td>{item['descriptions']}</td>
                  <td>{item['qty']}</td>
                  <td>{item['unit']}</td>
-                 <td>&#8369;{toDecimal(item['sellprice'])}</td>
+                 <td>&#8369;{toDecimal(item['sellPrice'])}</td>
                </tr>
               );
             })}

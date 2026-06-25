@@ -68,7 +68,7 @@ func (s *UploadImageServer) UploadProfilePicture(ctx context.Context, req *uploa
 	}
 
 	return &uploadProto.UserPictureResponse{
-		TextContent: "Multi-Factor has been enabled successfully.",
+		TextContent: "You have changed you profile picture successfully.",
 		Userpicture: newfile,
 	}, nil
 

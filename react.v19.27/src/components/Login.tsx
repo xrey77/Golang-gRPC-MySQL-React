@@ -38,7 +38,6 @@ export default function Login() {
       const qrcodeUrl = response.data?.qrcodeurl ?? '';
         // const roles = response.data?.roles ?? '';
       const token = response.data?.token ?? '';
-
       if (qrcodeUrl.length > 0) {
           window.sessionStorage.setItem('USERID', userId); 
           window.sessionStorage.setItem('TOKEN',response.data?.token ?? '');

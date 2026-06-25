@@ -1,3 +1,13 @@
+import { createClient } from "@connectrpc/connect";
+import { createConnectTransport } from "@connectrpc/connect-web";
+import { SalesService } from "../schema/salev1/sale_pb";
+
+const transport = createConnectTransport({
+  baseUrl: "http://localhost:8080",
+});
+
+const salesClient = createClient(SalesService, transport);
+
 import { useEffect, useRef, useState } from "react";
 import { useReactToPrint } from 'react-to-print';
 import { 
@@ -9,11 +19,10 @@ import {
   Tooltip, 
   Legend, 
 } from 'chart.js';
-import type { ChartOptions } from 'chart.js';
+import type { Chart, ChartOptions } from 'chart.js';
 
 import { Bar } from 'react-chartjs-2';
 import type { ChartData } from 'chart.js';
-import axios from "axios";
 
 ChartJS.register(
   CategoryScale,
@@ -24,18 +33,12 @@ ChartJS.register(
   Legend
 );
 
-const api = axios.create({
-  baseURL: "http://127.0.0.1:5000",
-  headers: {'Accept': 'application/json',
-            'Content-Type': 'application/json'}
-})
-
 const logo = new Image();
 logo.src = '/images/logo.png';
 
 const logoPlugin = {
   id: 'logoPlugin',
-  beforeDraw: (chart: any) => {
+  beforeDraw: (chart: Chart) => {
     if (logo.complete) {
       const { ctx, width } = chart;
       const logoWidth = 150;
@@ -50,13 +53,13 @@ const logoPlugin = {
   }
 };
 
-interface SalesData {
-  salesdate: string;
-  salesamount: number;
-}
+// interface SalesData {
+//   salesDate: string;
+//   salesAmount: number;
+// }
 
 export default function SalesChart() {
-  const [message, setMessage] = useState<string>('');
+  // const [message, setMessage] = useState<string>('');
 
 const options: ChartOptions<'bar'> = {
   responsive: true,
@@ -97,38 +100,45 @@ const options: ChartOptions<'bar'> = {
     documentTitle: "Sales Chart Report",
   });
 
-  const barChart = async () => {
-
-    try {      
-      const res = await api.get("/chartdata"); 
-      const result = res.data; 
-      if (result) {
-        const labels = result.map((item: SalesData) => 
-          new Date(item.salesdate).toLocaleString('en-US', { month: 'short' })
-        );
-        const data = result.map((item: SalesData) => item.salesamount);
-
-        setChartData({
-          labels,
-          datasets: [{
-            label: 'Sales',
-            data: data,
-            backgroundColor: 'rgba(60, 179, 113)',
-          }],
-        });
-      }
-    } catch (error: any) {
-      setMessage(error.message);
-    }
-  };
 
   useEffect(() => {
+    const barChart = async () => {
+
+      try {      
+        const response = await salesClient.getSales({});        
+        const result = response.data;
+
+        if (result) {
+
+          const labels = result.map(item =>
+              new Date(item.salesDate).toLocaleString("en-US", { month: "short" })
+            );
+
+
+          const xdata = result.map(item => item.salesAmount);
+
+          setChartData({
+            labels,
+            datasets: [{
+              label: 'Sales',
+              data: xdata,
+              backgroundColor: 'rgba(60, 179, 113)',
+            }],
+          });
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    
     barChart();
   }, []);
 
+
   return (
     <div className='container bg-white mt-3 r-corner'>
-      {message && <p style={{color: 'red'}}>{message}</p>}
+      {/* {message && <p style={{color: 'red'}}>{message}</p>} */}
       
       <div className="print-header">
         <h1>Sale Report</h1>

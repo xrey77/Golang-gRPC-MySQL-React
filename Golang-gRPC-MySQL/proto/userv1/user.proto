@@ -15,6 +15,7 @@ message UserProfile {
   bool is_active = 8;   
   bool is_blocked = 9;
   string mail_token = 10;
+  string qrcodeurl = 11;
 }
 
 message GetUserRequest {

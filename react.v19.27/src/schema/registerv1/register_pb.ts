@@ -6,12 +6,11 @@ import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegen
 import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv1";
 import type { Message } from "@bufbuild/protobuf";
 
-
 /**
  * Describes the file registerv1/register.proto.
  */
 export const file_registerv1_register: GenFile = /*@__PURE__*/
-  fileDesc("ChlyZWdpc3RlcnYxL3JlZ2lzdGVyLnByb3RvEgVwcm90byIiCg9SZWdpc3Rlck1lc3NhZ2USDwoHbWVzc2FnZRgBIAEoCSJ5Cg9SZWdpc3RlclJlcXVlc3QSEQoJZmlyc3RuYW1lGAEgASgJEhAKCGxhc3RuYW1lGAIgASgJEg0KBWVtYWlsGAMgASgJEg4KBm1vYmlsZRgEIAEoCRIQCgh1c2VybmFtZRgFIAEoCRIQCghwYXNzd29yZBgGIAEoCSI3ChBSZWdpc3RlclJlc3BvbnNlEiMKA21zZxgBIAEoCzIWLnByb3RvLlJlZ2lzdGVyTWVzc2FnZTJNCg5BY2NvdW50U2VydmljZRI7CghSZWdpc3RlchIWLnByb3RvLlJlZ2lzdGVyUmVxdWVzdBoXLnByb3RvLlJlZ2lzdGVyUmVzcG9uc2VCfQoJY29tLnByb3RvQg1SZWdpc3RlclByb3RvUAFaLWdvbGFuZ19ncnBjX215c3FsL3Byb3RvL3JlZ2lzdGVydjE7cmVnaXN0ZXJ2MaICA1BYWKoCBVByb3RvygIFUHJvdG/iAhFQcm90b1xHUEJNZXRhZGF0YeoCBVByb3RvYgZwcm90bzM");
+  fileDesc("ChlyZWdpc3RlcnYxL3JlZ2lzdGVyLnByb3RvEgVwcm90byIkCgxSZWdpc3RlckRhdGESFAoMdGV4dF9jb250ZW50GAEgASgJInkKD1JlZ2lzdGVyUmVxdWVzdBIRCglmaXJzdG5hbWUYASABKAkSEAoIbGFzdG5hbWUYAiABKAkSDQoFZW1haWwYAyABKAkSDgoGbW9iaWxlGAQgASgJEhAKCHVzZXJuYW1lGAUgASgJEhAKCHBhc3N3b3JkGAYgASgJIjUKEFJlZ2lzdGVyUmVzcG9uc2USIQoEZGF0YRgBIAEoCzITLnByb3RvLlJlZ2lzdGVyRGF0YTJNCg5BY2NvdW50U2VydmljZRI7CghSZWdpc3RlchIWLnByb3RvLlJlZ2lzdGVyUmVxdWVzdBoXLnByb3RvLlJlZ2lzdGVyUmVzcG9uc2VCfQoJY29tLnByb3RvQg1SZWdpc3RlclByb3RvUAFaLWdvbGFuZ19ncnBjX215c3FsL3Byb3RvL3JlZ2lzdGVydjE7cmVnaXN0ZXJ2MaICA1BYWKoCBVByb3RvygIFUHJvdG/iAhFQcm90b1xHUEJNZXRhZGF0YeoCBVByb3RvYgZwcm90bzM");
 
 /**
  * @generated from message proto.RegisterData
@@ -24,10 +23,10 @@ export type RegisterData = Message<"proto.RegisterData"> & {
 };
 
 /**
- * Describes the message proto.RegisterMessage.
- * Use `create(RegisterMessageSchema)` to create a new message.
+ * Describes the message proto.RegisterData.
+ * Use `create(RegisterDataSchema)` to create a new message.
  */
-export const RegisterMessageSchema: GenMessage<RegisterData> = /*@__PURE__*/
+export const RegisterDataSchema: GenMessage<RegisterData> = /*@__PURE__*/
   messageDesc(file_registerv1_register, 0);
 
 /**
@@ -77,7 +76,7 @@ export const RegisterRequestSchema: GenMessage<RegisterRequest> = /*@__PURE__*/
  */
 export type RegisterResponse = Message<"proto.RegisterResponse"> & {
   /**
-   * @generated from field: proto.Registerdata data = 1;
+   * @generated from field: proto.RegisterData data = 1;
    */
   data?: RegisterData;
 };

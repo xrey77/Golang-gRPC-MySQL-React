@@ -89,6 +89,7 @@ func (s *LoginServer) Login(ctx context.Context, req *loginProto.LoginRequest) (
 	return &loginProto.LoginResponse{
 		Data: &loginProto.LoginData{
 			TextContent: "Login successful, please wait.",
+			Id:          user.ToProto().GetId(),
 			FirstName:   user.Firstname,
 			LastName:    user.Lastname,
 			Email:       user.Email,

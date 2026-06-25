@@ -21,10 +21,10 @@ type MfaServer struct {
 }
 
 func (s *MfaServer) MfaActivation(ctx context.Context, req *mfaProto.MfaActivationRequest) (*mfaProto.MfaActivationResponse, error) {
-	_, err1 := validateToken(ctx)
-	if err1 != nil {
-		return nil, status.Error(codes.Unauthenticated, err1.Error())
-	}
+	// _, err1 := validateToken(ctx)
+	// if err1 != nil {
+	// 	return nil, status.Error(codes.Unauthenticated, err1.Error())
+	// }
 
 	if req.GetId() == "" {
 		return nil, status.Error(codes.InvalidArgument, "user ID is required")
@@ -87,6 +87,16 @@ func (s *MfaServer) MfaActivation(ctx context.Context, req *mfaProto.MfaActivati
 
 		updateData["secret"] = nil
 		updateData["qrcodeurl"] = nil
+		result := s.DB.WithContext(ctx).Model(&models.User{}).Where("id = ?", req.GetId()).Updates(updateData)
+
+		if result.Error != nil {
+			return nil, status.Errorf(codes.Internal, "failed to update profile: %v", result.Error)
+		}
+
+		if result.RowsAffected == 0 {
+			return nil, status.Error(codes.NotFound, "user not found")
+		}
+
 		return &mfaProto.MfaActivationResponse{
 			TextContent: "Multi-Factor has been disabled successfully.",
 		}, nil
@@ -94,10 +104,10 @@ func (s *MfaServer) MfaActivation(ctx context.Context, req *mfaProto.MfaActivati
 }
 
 func (s *MfaServer) MfaVerification(ctx context.Context, req *mfaProto.MfaVerifyRequest) (*mfaProto.MfaVerifyResponse, error) {
-	_, err1 := validateToken(ctx)
-	if err1 != nil {
-		return nil, status.Error(codes.Unauthenticated, err1.Error())
-	}
+	// _, err1 := validateToken(ctx)
+	// if err1 != nil {
+	// 	return nil, status.Error(codes.Unauthenticated, err1.Error())
+	// }
 
 	if req.GetId() == "" {
 		return nil, status.Error(codes.InvalidArgument, "user ID is required")
@@ -130,10 +140,7 @@ func (s *MfaServer) MfaVerification(ctx context.Context, req *mfaProto.MfaVerify
 		}, nil
 
 	} else {
-		return &mfaProto.MfaVerifyResponse{
-			TextContent: "Invalid OTP code, please try again.",
-			Username:    nil,
-		}, nil
+		return nil, status.Error(codes.InvalidArgument, "Invalid OTP code, please try again.")
 	}
 
 }

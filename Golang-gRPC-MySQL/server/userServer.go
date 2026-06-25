@@ -19,10 +19,10 @@ type UserServer struct {
 }
 
 func (s *UserServer) GetUser(ctx context.Context, req *userProto.GetUserRequest) (*userProto.GetUserResponse, error) {
-	_, err1 := validateToken(ctx)
-	if err1 != nil {
-		return nil, status.Error(codes.Unauthenticated, err1.Error())
-	}
+	// _, err1 := validateToken(ctx)
+	// if err1 != nil {
+	// 	return nil, status.Error(codes.Unauthenticated, err1.Error())
+	// }
 
 	if req.GetId() == "" {
 		return nil, status.Error(codes.InvalidArgument, "User ID is required")
@@ -69,10 +69,10 @@ func (s *UserServer) GetAllUsers(ctx context.Context, req *userProto.GetAllUsers
 
 // UPDATE USER PROFILE
 func (s *UserServer) UpdateUserProfile(ctx context.Context, req *userProto.UpdateUserProfileRequest) (*userProto.UpdateUserProfileResponse, error) {
-	_, err1 := validateToken(ctx)
-	if err1 != nil {
-		return nil, status.Error(codes.Unauthenticated, err1.Error())
-	}
+	// _, err1 := validateToken(ctx)
+	// if err1 != nil {
+	// 	return nil, status.Error(codes.Unauthenticated, err1.Error())
+	// }
 
 	if req.GetId() == "" {
 		return nil, status.Error(codes.InvalidArgument, "user ID is required")
@@ -113,10 +113,10 @@ func (s *UserServer) UpdateUserProfile(ctx context.Context, req *userProto.Updat
 
 // CHANGE PASSWORD
 func (s *UserServer) ChangePassword(ctx context.Context, req *userProto.ChangePasswordRequest) (*userProto.ChangePasswordResponse, error) {
-	_, err1 := validateToken(ctx)
-	if err1 != nil {
-		return nil, status.Error(codes.Unauthenticated, err1.Error())
-	}
+	// _, err1 := validateToken(ctx)
+	// if err1 != nil {
+	// 	return nil, status.Error(codes.Unauthenticated, err1.Error())
+	// }
 
 	if req.GetId() == "" {
 		return nil, status.Error(codes.InvalidArgument, "user ID is required")

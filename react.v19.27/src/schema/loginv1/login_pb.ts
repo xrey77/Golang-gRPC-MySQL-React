@@ -11,7 +11,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file loginv1/login.proto.
  */
 export const file_loginv1_login: GenFile = /*@__PURE__*/
-  fileDesc("ChNsb2dpbnYxL2xvZ2luLnByb3RvEgVwcm90byKGAgoJTG9naW5EYXRhEhQKDHRleHRfY29udGVudBgBIAEoCRISCgpmaXJzdF9uYW1lGAIgASgJEhEKCWxhc3RfbmFtZRgDIAEoCRINCgVlbWFpbBgEIAEoCRIOCgZtb2JpbGUYBSABKAkSEAoIdXNlcm5hbWUYBiABKAkSEAoIdXNlcl9waWMYByABKAkSEQoJaXNfYWN0aXZlGAggASgIEhIKCmlzX2Jsb2NrZWQYCSABKAgSEgoKbWFpbF90b2tlbhgKIAEoBRIvCglxcmNvZGV1cmwYCyABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSDQoFdG9rZW4YDCABKAkiMgoMTG9naW5SZXF1ZXN0EhAKCHVzZXJuYW1lGAEgASgJEhAKCHBhc3N3b3JkGAIgASgJIi8KDUxvZ2luUmVzcG9uc2USHgoEZGF0YRgBIAEoCzIQLnByb3RvLkxvZ2luRGF0YTJCCgxMb2dpblNlcnZpY2USMgoFTG9naW4SEy5wcm90by5Mb2dpblJlcXVlc3QaFC5wcm90by5Mb2dpblJlc3BvbnNlQnQKCWNvbS5wcm90b0IKTG9naW5Qcm90b1ABWidnb2xhbmdfZ3JwY19teXNxbC9wcm90by9sb2dpbnYxO2xvZ2ludjGiAgNQWFiqAgVQcm90b8oCBVByb3Rv4gIRUHJvdG9cR1BCTWV0YWRhdGHqAgVQcm90b2IGcHJvdG8z", [file_google_protobuf_wrappers]);
+  fileDesc("ChNsb2dpbnYxL2xvZ2luLnByb3RvEgVwcm90byKSAgoJTG9naW5EYXRhEhQKDHRleHRfY29udGVudBgBIAEoCRIKCgJpZBgCIAEoCRISCgpmaXJzdF9uYW1lGAMgASgJEhEKCWxhc3RfbmFtZRgEIAEoCRINCgVlbWFpbBgFIAEoCRIOCgZtb2JpbGUYBiABKAkSEAoIdXNlcm5hbWUYByABKAkSEAoIdXNlcl9waWMYCCABKAkSEQoJaXNfYWN0aXZlGAkgASgIEhIKCmlzX2Jsb2NrZWQYCiABKAgSEgoKbWFpbF90b2tlbhgLIAEoBRIvCglxcmNvZGV1cmwYDCABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSDQoFdG9rZW4YDSABKAkiMgoMTG9naW5SZXF1ZXN0EhAKCHVzZXJuYW1lGAEgASgJEhAKCHBhc3N3b3JkGAIgASgJIi8KDUxvZ2luUmVzcG9uc2USHgoEZGF0YRgBIAEoCzIQLnByb3RvLkxvZ2luRGF0YTJCCgxMb2dpblNlcnZpY2USMgoFTG9naW4SEy5wcm90by5Mb2dpblJlcXVlc3QaFC5wcm90by5Mb2dpblJlc3BvbnNlQnQKCWNvbS5wcm90b0IKTG9naW5Qcm90b1ABWidnb2xhbmdfZ3JwY19teXNxbC9wcm90by9sb2dpbnYxO2xvZ2ludjGiAgNQWFiqAgVQcm90b8oCBVByb3Rv4gIRUHJvdG9cR1BCTWV0YWRhdGHqAgVQcm90b2IGcHJvdG8z", [file_google_protobuf_wrappers]);
 
 /**
  * @generated from message proto.LoginData
@@ -23,62 +23,62 @@ export type LoginData = Message<"proto.LoginData"> & {
   textContent: string;
 
   /**
-   * @generated from field: int32 id = 10;
+   * @generated from field: string id = 2;
    */
-  id: number;
+  id: string;
 
   /**
-   * @generated from field: string first_name = 2;
+   * @generated from field: string first_name = 3;
    */
   firstName: string;
 
   /**
-   * @generated from field: string last_name = 3;
+   * @generated from field: string last_name = 4;
    */
   lastName: string;
 
   /**
-   * @generated from field: string email = 4;
+   * @generated from field: string email = 5;
    */
   email: string;
 
   /**
-   * @generated from field: string mobile = 5;
+   * @generated from field: string mobile = 6;
    */
   mobile: string;
 
   /**
-   * @generated from field: string username = 6;
+   * @generated from field: string username = 7;
    */
   username: string;
 
   /**
-   * @generated from field: string user_pic = 7;
+   * @generated from field: string user_pic = 8;
    */
   userPic: string;
 
   /**
-   * @generated from field: bool is_active = 8;
+   * @generated from field: bool is_active = 9;
    */
   isActive: boolean;
 
   /**
-   * @generated from field: bool is_blocked = 9;
+   * @generated from field: bool is_blocked = 10;
    */
   isBlocked: boolean;
 
   /**
-   * @generated from field: int32 mail_token = 10;
+   * @generated from field: int32 mail_token = 11;
    */
   mailToken: number;
 
   /**
-   * @generated from field: google.protobuf.StringValue qrcodeurl = 11;
+   * @generated from field: google.protobuf.StringValue qrcodeurl = 12;
    */
   qrcodeurl?: string;
 
   /**
-   * @generated from field: string token = 12;
+   * @generated from field: string token = 13;
    */
   token: string;
 };

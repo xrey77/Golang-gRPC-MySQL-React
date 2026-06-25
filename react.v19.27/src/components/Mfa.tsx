@@ -1,52 +1,70 @@
 import { useState } from "react"
 import jQuery from "jquery";
-import axios from 'axios';
+import { ConnectError, createClient } from "@connectrpc/connect";
+import { createConnectTransport } from "@connectrpc/connect-web";
+import { MfaService } from "../schema/mfav1/mfa_pb";
 
-const api = axios.create({
-   baseURL: "http://localhost:5000",
-   headers: {'Accept': 'application/json',
-             'Content-Type': 'application/json'}
-})
+const transport = createConnectTransport({
+  baseUrl: "http://localhost:8080",
+  interceptors: [
+    (next) => async (req) => {
+      const token = sessionStorage.getItem('TOKEN');
+      if (token) {
+        req.header.set("Authorization", `Bearer ${token}`);
+      }
+      return await next(req);
+    },
+  ],
+});
+
+const mfaclient = createClient(MfaService, transport);
+
 
 export default function Mfa() {
   const [otp, setOtp] = useState<string>('');
   const [message, setMessage] = useState<string>('');
     const [isdisabled, setIsdisabled] = useState<boolean>(false);
 
-  const submitMfa = (event: any) => {
+  const submitMfa = async (event: React.SubmitEvent<HTMLFormElement>) => { 
     event.preventDefault();
     setIsdisabled(true);
-    const userid = sessionStorage.getItem('USERID');
-    const token = sessionStorage.getItem('TOKEN');
+    const userid = sessionStorage.getItem('USERID') || '';
 
-    setMessage('please wait..');
-    const jsonData =JSON.stringify({otp: otp });
-    api.patch(`api/mfa/verifytotp/${userid}`, jsonData, {headers: {
-      Authorization: `Bearer ${token}`
-  }})
-    .then((res: any) => {
-          setMessage(res.data.message);
-            sessionStorage.setItem("USERNAME", res.data.username);
-            window.setTimeout(() => {
-              setMessage('');
-              jQuery("#mfaReset").trigger('click');
-              window.location.reload();
-            }, 3000);
-      }, (error: any) => {
-            if (error.response) {
-              setMessage(error.response.data.message);            
-            } else {
-              setMessage(error.message);            
+    try {
+        const response = await mfaclient.mfaVerification(
+            {               
+                id: userid,
+                otp: otp
             }
-            window.setTimeout(() => {
-              setMessage('');
-              setIsdisabled(false);
-            }, 3000);
-            return;
-    });        
+        );
+        setMessage(response.textContent ?? '');
+        const usrname = response.username ?? '';
+        sessionStorage.setItem("USERNAME", usrname );
+        setTimeout(() => {
+          setMessage('');
+          jQuery("#mfaReset").trigger('click');
+          location.reload();
+        }, 3000);
+
+
+    } catch (err) {
+
+        const connectErr = ConnectError.from(err);
+        console.log(ConnectError);
+        const cleanMessage = connectErr.rawMessage.includes("desc = ")
+        ? connectErr.rawMessage.split("desc = ")[1]
+        : connectErr.rawMessage;
+        setMessage(cleanMessage);
+        setTimeout(() => {
+          setMessage('');
+          setOtp('');
+          setIsdisabled(false);
+        }, 3000);
+        return;
+    }
   }
 
-  const closeMfa = (event: any) => {
+  const closeMfa = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     setMessage('');
     setOtp('');

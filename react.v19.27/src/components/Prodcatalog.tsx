@@ -1,93 +1,147 @@
-import axios from "axios"
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
+import { ConnectError, createClient } from "@connectrpc/connect";
+import { createConnectTransport } from "@connectrpc/connect-web";
+import { ProductService } from '../schema/productv1/product_pb';
+import { type ProductData } from '../schema/productv1/product_pb';
 
-const api = axios.create({
-  baseURL: "http://localhost:5000",
-  headers: {'Accept': 'application/json',
-            'Content-Type': 'application/json'}
-})
+const transport = createConnectTransport({
+  baseUrl: "http://localhost:8080",
+});
 
-const toDecimal = (number: any) => {
-  const formatter = new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-  return formatter.format(number);
-};
+const productClient = createClient(ProductService, transport);
+
+  const toDecimal = (amt: string) => {
+    const formatter = new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+    const price = parseFloat(amt);
+    return formatter.format(price);
+  };
+
+
 export default function Prodcatalog() {
-    let [page, setPage] = useState<number>(1);
-    let [prods, setProds] = useState<[]>([]);
-    let [totpage, setTotpage] = useState<number>(0);
-    let [totalrecords, setTotalrecords] = useState<number>(0);
-    const [message, setMessage] = useState('');
+    const [page, setPage] = useState<bigint>(1n);
+    const [totpage, setTotpage] = useState<bigint>(0n);
+    const [totalrecs, setTotalrecs] = useState<bigint>(0n);
+    const [message, setMessage] = useState<string>('');
+    const [products, setProducts] = useState<ProductData[]>([]);
 
-    const fetchCatalog = async (pg: any) => {
-      api.get(`/products/list/${pg}`)
-      .then((res: any) => {
-        setProds(res.data.products);
-        setTotpage(res.data.totpage);
-        setTotalrecords(res.data.totalrecords);
-        setPage(res.data.page);
-      }, (error: any) => {
-              setMessage(error.response.data.message);
-              return;
-      });      
+    const fetchCatalog = async (pg: bigint) => {
+        try {
+            const response = await productClient.getProductList(
+                {               
+                  page: BigInt(pg)
+                }
+            );
+            setProducts(response.products);
+            setPage(response.page);
+            setTotpage(response.totalPages);
+            
+            setTotalrecs(response.totalRecords);
+            
+
+        } catch (err) {
+
+            const connectErr = ConnectError.from(err);
+            console.log(ConnectError);
+            const cleanMessage = connectErr.rawMessage.includes("desc = ")
+            ? connectErr.rawMessage.split("desc = ")[1]
+            : connectErr.rawMessage;
+            setMessage(cleanMessage);
+            setTimeout(() => {
+              setMessage('');
+            }, 3000);
+        }
     }
 
     useEffect(() => {
-      fetchCatalog(page)
+      const fetchProducts = async (pg: bigint) => {
+          try {
+              const response = await productClient.getProductList(
+                  {               
+                    page: BigInt(pg)
+                  }
+              );
+              setProducts(response.products);
+              setPage(response.page);
+              setTotpage(response.totalPages);
+              
+              setTotalrecs(response.totalRecords);
+              
+
+          } catch (err) {
+
+              const connectErr = ConnectError.from(err);
+              console.log(ConnectError);
+              const cleanMessage = connectErr.rawMessage.includes("desc = ")
+              ? connectErr.rawMessage.split("desc = ")[1]
+              : connectErr.rawMessage;
+              setMessage(cleanMessage);
+              setTimeout(() => {
+                setMessage('');
+              }, 3000);
+          }
+
+      }
+
+      fetchProducts(page)
     },[page]);
 
-    const firstPage = (event: any) => {
-        event.preventDefault();    
-        page = 1;
-        return fetchCatalog(page);
+    const firstPage = (event: React.MouseEvent<HTMLAnchorElement>) => { 
+        event.preventDefault();
+        fetchCatalog(1n);  
+        return;    
       }
     
-      const nextPage = (event: any) => {
+      const nextPage = (event: React.MouseEvent<HTMLAnchorElement>) => {
         event.preventDefault();    
         if (page == totpage) {
             setPage(totpage);
             return;
-        } else {
-          page++;
-          return fetchCatalog(page);  
         }
+        let pg: bigint = page;
+        pg++;
+        setPage(pg);
+        return fetchCatalog(pg);
       }
     
-      const prevPage = (event: any) => {
+      const prevPage = (event: React.MouseEvent<HTMLAnchorElement>) => {
         event.preventDefault();    
-        if (page === 1) {
-          setPage(1);
+        if (page === 1n) {
           return;
           }
-          page--;
-          return fetchCatalog(page);
+          let pg: bigint = page;
+          pg--;
+          setPage(pg);
+          return fetchCatalog(pg);
       }
     
-      const lastPage = (event: any) => {
+      const lastPage = (event: React.MouseEvent<HTMLAnchorElement>) => {
         event.preventDefault();
-        page = totpage;
-        return fetchCatalog(page);
-      }
+        const pg = totpage;
+        setPage(pg);
+        return fetchCatalog(pg);
+      }  
+
 
     return(
     <div className="container mt-2 mb-9">
             <h3 className="text-warning embossed mt-3">Products Catalog</h3>
             <div className="text-warning">{message}</div>
             <div className="card-group mb-3">
-            {prods.map((item) => {
+            {products.map((item) => {
                     return (
                       <div className='col-md-4'>
                       <div key={item['id']} className="card mx-3 mt-3">
-                          <img src={`http://localhost:5000/assets/products/${item['productpicture']}`} className="card-img-top product-size" alt=""/>
+                          <img src={`http://localhost:8080/assets/products/${item['productPicture']}`} className="card-img-top product-size" alt=""/>
                           <div className="card-body">
                             <h5 className="card-title">Descriptions</h5>
                             <p className="card-text desc-h">{item['descriptions']}</p>
                           </div>
                           <div className="card-footer">
-                            <p className="card-text text-danger"><span className="text-dark">PRICE :</span>&nbsp;<strong>&#8369;{toDecimal(item['sellprice'])}</strong></p>
+                            <p className="card-text text-danger"><span className="text-dark">PRICE :</span>&nbsp;<strong>&#8369;{toDecimal(item['sellPrice'])}</strong></p>
                           </div>  
                       </div>
                       
@@ -107,7 +161,7 @@ export default function Prodcatalog() {
           <li className="page-item page-link text-danger sm">Page&nbsp;{page} of&nbsp;{totpage}</li>
         </ul>
       </nav>
-      <div className='text-warning'><strong>Total Records : {totalrecords}</strong></div>
+      <div className='text-warning'><strong>Total Records : {totalrecs}</strong></div>
 
       <br/><br/>
       </div>
