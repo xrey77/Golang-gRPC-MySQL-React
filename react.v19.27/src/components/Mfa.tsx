@@ -2,7 +2,7 @@ import { useState } from "react"
 import jQuery from "jquery";
 import { ConnectError, createClient } from "@connectrpc/connect";
 import { createConnectTransport } from "@connectrpc/connect-web";
-import { MfaService } from "../schema/mfav1/mfa_pb";
+import { MfaService } from "../_schema/mfav1/mfa_pb";
 
 const transport = createConnectTransport({
   baseUrl: "http://localhost:8080",
@@ -10,15 +10,15 @@ const transport = createConnectTransport({
     (next) => async (req) => {
       const token = sessionStorage.getItem('TOKEN');
       if (token) {
-        req.header.set("Authorization", `Bearer ${token}`);
+        req.header.set("authorization", `Bearer ${token}`); 
       }
       return await next(req);
     },
   ],
 });
 
-const mfaclient = createClient(MfaService, transport);
 
+const mfaclient = createClient(MfaService, transport);
 
 export default function Mfa() {
   const [otp, setOtp] = useState<string>('');

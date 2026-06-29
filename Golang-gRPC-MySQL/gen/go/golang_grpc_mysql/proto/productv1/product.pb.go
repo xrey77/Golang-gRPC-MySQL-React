@@ -345,6 +345,86 @@ func (x *GetProductSearchResponse) GetProducts() []*ProductData {
 	return nil
 }
 
+type GetProductReportRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetProductReportRequest) Reset() {
+	*x = GetProductReportRequest{}
+	mi := &file_productv1_product_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetProductReportRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetProductReportRequest) ProtoMessage() {}
+
+func (x *GetProductReportRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_productv1_product_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetProductReportRequest.ProtoReflect.Descriptor instead.
+func (*GetProductReportRequest) Descriptor() ([]byte, []int) {
+	return file_productv1_product_proto_rawDescGZIP(), []int{5}
+}
+
+type GetProductReportResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Products      []*ProductData         `protobuf:"bytes,1,rep,name=products,proto3" json:"products,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetProductReportResponse) Reset() {
+	*x = GetProductReportResponse{}
+	mi := &file_productv1_product_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetProductReportResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetProductReportResponse) ProtoMessage() {}
+
+func (x *GetProductReportResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_productv1_product_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetProductReportResponse.ProtoReflect.Descriptor instead.
+func (*GetProductReportResponse) Descriptor() ([]byte, []int) {
+	return file_productv1_product_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *GetProductReportResponse) GetProducts() []*ProductData {
+	if x != nil {
+		return x.Products
+	}
+	return nil
+}
+
 var File_productv1_product_proto protoreflect.FileDescriptor
 
 const file_productv1_product_proto_rawDesc = "" +
@@ -376,10 +456,14 @@ const file_productv1_product_proto_rawDesc = "" +
 	"\vtotal_pages\x18\x02 \x01(\x03R\n" +
 	"totalPages\x12#\n" +
 	"\rtotal_records\x18\x03 \x01(\x03R\ftotalRecords\x12.\n" +
-	"\bproducts\x18\x04 \x03(\v2\x12.proto.ProductDataR\bproducts2\xb4\x01\n" +
+	"\bproducts\x18\x04 \x03(\v2\x12.proto.ProductDataR\bproducts\"\x19\n" +
+	"\x17GetProductReportRequest\"J\n" +
+	"\x18GetProductReportResponse\x12.\n" +
+	"\bproducts\x18\x01 \x03(\v2\x12.proto.ProductDataR\bproducts2\x8c\x02\n" +
 	"\x0eProductService\x12M\n" +
 	"\x0eGetProductList\x12\x1c.proto.GetProductListRequest\x1a\x1d.proto.GetProductListResponse\x12S\n" +
-	"\x10GetProductSearch\x12\x1e.proto.GetProductSearchRequest\x1a\x1f.proto.GetProductSearchResponseBz\n" +
+	"\x10GetProductSearch\x12\x1e.proto.GetProductSearchRequest\x1a\x1f.proto.GetProductSearchResponse\x12V\n" +
+	"\x13GetProductPdfReport\x12\x1e.proto.GetProductReportRequest\x1a\x1f.proto.GetProductReportResponseBz\n" +
 	"\tcom.protoB\fProductProtoP\x01Z+golang_grpc_mysql/proto/productv1;productv1\xa2\x02\x03PXX\xaa\x02\x05Proto\xca\x02\x05Proto\xe2\x02\x11Proto\\GPBMetadata\xea\x02\x05Protob\x06proto3"
 
 var (
@@ -394,26 +478,31 @@ func file_productv1_product_proto_rawDescGZIP() []byte {
 	return file_productv1_product_proto_rawDescData
 }
 
-var file_productv1_product_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_productv1_product_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_productv1_product_proto_goTypes = []any{
 	(*ProductData)(nil),              // 0: proto.ProductData
 	(*GetProductListRequest)(nil),    // 1: proto.GetProductListRequest
 	(*GetProductListResponse)(nil),   // 2: proto.GetProductListResponse
 	(*GetProductSearchRequest)(nil),  // 3: proto.GetProductSearchRequest
 	(*GetProductSearchResponse)(nil), // 4: proto.GetProductSearchResponse
+	(*GetProductReportRequest)(nil),  // 5: proto.GetProductReportRequest
+	(*GetProductReportResponse)(nil), // 6: proto.GetProductReportResponse
 }
 var file_productv1_product_proto_depIdxs = []int32{
 	0, // 0: proto.GetProductListResponse.products:type_name -> proto.ProductData
 	0, // 1: proto.GetProductSearchResponse.products:type_name -> proto.ProductData
-	1, // 2: proto.ProductService.GetProductList:input_type -> proto.GetProductListRequest
-	3, // 3: proto.ProductService.GetProductSearch:input_type -> proto.GetProductSearchRequest
-	2, // 4: proto.ProductService.GetProductList:output_type -> proto.GetProductListResponse
-	4, // 5: proto.ProductService.GetProductSearch:output_type -> proto.GetProductSearchResponse
-	4, // [4:6] is the sub-list for method output_type
-	2, // [2:4] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	0, // 2: proto.GetProductReportResponse.products:type_name -> proto.ProductData
+	1, // 3: proto.ProductService.GetProductList:input_type -> proto.GetProductListRequest
+	3, // 4: proto.ProductService.GetProductSearch:input_type -> proto.GetProductSearchRequest
+	5, // 5: proto.ProductService.GetProductPdfReport:input_type -> proto.GetProductReportRequest
+	2, // 6: proto.ProductService.GetProductList:output_type -> proto.GetProductListResponse
+	4, // 7: proto.ProductService.GetProductSearch:output_type -> proto.GetProductSearchResponse
+	6, // 8: proto.ProductService.GetProductPdfReport:output_type -> proto.GetProductReportResponse
+	6, // [6:9] is the sub-list for method output_type
+	3, // [3:6] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_productv1_product_proto_init() }
@@ -427,7 +516,7 @@ func file_productv1_product_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_productv1_product_proto_rawDesc), len(file_productv1_product_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

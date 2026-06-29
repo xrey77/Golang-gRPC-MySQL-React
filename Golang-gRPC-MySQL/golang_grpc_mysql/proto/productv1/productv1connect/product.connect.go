@@ -7,11 +7,10 @@ package productv1connect
 import (
 	context "context"
 	errors "errors"
+	connect_go "github.com/bufbuild/connect-go"
 	productv1 "golang_grpc_mysql/proto/productv1"
 	http "net/http"
 	strings "strings"
-
-	connect_go "github.com/bufbuild/connect-go"
 )
 
 // This is a compile-time assertion to ensure that this generated file and the connect package are
@@ -39,7 +38,9 @@ const (
 	ProductServiceGetProductListProcedure = "/proto.ProductService/GetProductList"
 	// ProductServiceGetProductSearchProcedure is the fully-qualified name of the ProductService's
 	// GetProductSearch RPC.
-	ProductServiceGetProductSearchProcedure    = "/proto.ProductService/GetProductSearch"
+	ProductServiceGetProductSearchProcedure = "/proto.ProductService/GetProductSearch"
+	// ProductServiceGetProductPdfReportProcedure is the fully-qualified name of the ProductService's
+	// GetProductPdfReport RPC.
 	ProductServiceGetProductPdfReportProcedure = "/proto.ProductService/GetProductPdfReport"
 )
 
@@ -95,6 +96,7 @@ func (c *productServiceClient) GetProductSearch(ctx context.Context, req *connec
 	return c.getProductSearch.CallUnary(ctx, req)
 }
 
+// GetProductPdfReport calls proto.ProductService.GetProductPdfReport.
 func (c *productServiceClient) GetProductPdfReport(ctx context.Context, req *connect_go.Request[productv1.GetProductReportRequest]) (*connect_go.Response[productv1.GetProductReportResponse], error) {
 	return c.getProductPdfReport.CallUnary(ctx, req)
 }
@@ -127,7 +129,6 @@ func NewProductServiceHandler(svc ProductServiceHandler, opts ...connect_go.Hand
 		svc.GetProductPdfReport,
 		opts...,
 	)
-
 	return "/proto.ProductService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case ProductServiceGetProductListProcedure:

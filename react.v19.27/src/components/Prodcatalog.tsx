@@ -2,8 +2,8 @@ import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { ConnectError, createClient } from "@connectrpc/connect";
 import { createConnectTransport } from "@connectrpc/connect-web";
-import { ProductService } from '../schema/productv1/product_pb';
-import { type ProductData } from '../schema/productv1/product_pb';
+import { ProductService } from '../_schema/productv1/product_pb';
+import { type ProductData } from '../_schema/productv1/product_pb';
 
 const transport = createConnectTransport({
   baseUrl: "http://localhost:8080",

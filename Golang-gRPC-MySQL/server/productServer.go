@@ -4,6 +4,7 @@ package server
 import (
 	"context"
 	"golang_grpc_mysql/models"
+	"golang_grpc_mysql/proto/productv1"
 	productProto "golang_grpc_mysql/proto/productv1"
 
 	"google.golang.org/grpc/codes"
@@ -131,5 +132,24 @@ func (s *ProductServer) GetProductSearch(ctx context.Context, req *productProto.
 		TotalPages:   totalPages,
 		TotalRecords: totalRecords,
 		Products:     pbProducts,
+	}, nil
+}
+
+func (s *ProductServer) GetProductPdfReport(ctx context.Context, req *productv1.GetProductReportRequest) (*productProto.GetProductReportResponse, error) {
+	var products []models.Product
+	err := s.DB.WithContext(ctx).Find(&products).Error
+
+	if err != nil {
+		return nil, status.Error(codes.Internal, "Failed to fetch Products")
+	}
+
+	pbProducts := make([]*productProto.ProductData, 0, len(products))
+
+	for i := range products {
+		pbProducts = append(pbProducts, products[i].ToProto())
+	}
+
+	return &productProto.GetProductReportResponse{
+		Products: pbProducts,
 	}, nil
 }

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ConnectError, createClient } from "@connectrpc/connect";
 import { createConnectTransport } from "@connectrpc/connect-web";
-import { AccountService } from "../schema/registerv1/register_pb"; 
+import { AccountService } from "../_schema/registerv1/register_pb"; 
 
 const transport = createConnectTransport({
   baseUrl: "http://localhost:8080",

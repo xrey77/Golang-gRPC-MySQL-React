@@ -1,6 +1,6 @@
 import { createClient } from "@connectrpc/connect";
 import { createConnectTransport } from "@connectrpc/connect-web";
-import { SalesService } from "../schema/salev1/sale_pb";
+import { SalesService } from "../_schema/salev1/sale_pb";
 
 const transport = createConnectTransport({
   baseUrl: "http://localhost:8080",

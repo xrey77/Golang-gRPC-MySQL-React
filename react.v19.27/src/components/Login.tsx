@@ -4,7 +4,7 @@ import Mfa from "./Mfa.tsx";
 import jQuery from "jquery";
 import { ConnectError, createClient } from "@connectrpc/connect";
 import { createConnectTransport } from "@connectrpc/connect-web";
-import { LoginService } from "../schema/loginv1/login_pb"; 
+import { LoginService } from "../_schema/loginv1/login_pb.ts"; 
 
 const transport = createConnectTransport({
   baseUrl: "http://localhost:8080",

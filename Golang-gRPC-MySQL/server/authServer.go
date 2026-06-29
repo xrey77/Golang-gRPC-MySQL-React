@@ -4,6 +4,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -16,12 +17,21 @@ var jwtSecretKey = []byte("f7bc028ed2f6c641f173b120688339f9")
 
 func validateToken(ctx context.Context) (*jwt.MapClaims, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
+
+	for k, v := range md {
+		log.Printf("Metadata Key: %s, Value: %v", k, v)
+	}
+
 	if !ok {
 		return nil, status.Error(codes.Unauthenticated, "metadata is missing")
 	}
 
 	authHeader := md.Get("authorization")
 	if len(authHeader) == 0 {
+		authHeader = md.Get("Authorization")
+	}
+
+	if len(authHeader) == 0 || authHeader[0] == "" {
 		return nil, status.Error(codes.Unauthenticated, "authorization token is missing")
 	}
 
@@ -29,6 +39,7 @@ func validateToken(ctx context.Context) (*jwt.MapClaims, error) {
 	if !strings.HasPrefix(tokenStr, "Bearer ") {
 		return nil, status.Error(codes.Unauthenticated, "authorization header must be Bearer token")
 	}
+
 	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
 
 	token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
@@ -48,4 +59,5 @@ func validateToken(ctx context.Context) (*jwt.MapClaims, error) {
 	}
 
 	return &claims, nil
+
 }

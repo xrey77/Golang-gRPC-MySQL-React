@@ -6,6 +6,7 @@ import (
 	"errors"
 	"golang_grpc_mysql/models"
 	userProto "golang_grpc_mysql/proto/userv1"
+	"log"
 
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
@@ -19,10 +20,11 @@ type UserServer struct {
 }
 
 func (s *UserServer) GetUser(ctx context.Context, req *userProto.GetUserRequest) (*userProto.GetUserResponse, error) {
-	// _, err1 := validateToken(ctx)
-	// if err1 != nil {
-	// 	return nil, status.Error(codes.Unauthenticated, err1.Error())
-	// }
+	_, err1 := validateToken(ctx)
+	if err1 != nil {
+		log.Print("")
+		// return nil, status.Error(codes.Unauthenticated, err1.Error())
+	}
 
 	if req.GetId() == "" {
 		return nil, status.Error(codes.InvalidArgument, "User ID is required")

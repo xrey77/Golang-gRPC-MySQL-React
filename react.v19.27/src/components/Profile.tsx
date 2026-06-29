@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import jQuery from 'jquery';
 import { ConnectError, createClient } from "@connectrpc/connect";
 import { createConnectTransport } from "@connectrpc/connect-web";
-import { UserService } from "../schema/userv1/user_pb"; 
-import { MfaService } from "../schema/mfav1/mfa_pb";
-import { UploadPictureService } from "../schema/uploadv1/uploadImage_pb";
+import { UserService } from "../_schema/userv1/user_pb"; 
+import { MfaService } from "../_schema/mfav1/mfa_pb";
+import { UploadPictureService } from "../_schema/uploadv1/uploadImage_pb";
 
 const transport = createConnectTransport({
   baseUrl: "http://localhost:8080",
@@ -12,12 +12,13 @@ const transport = createConnectTransport({
     (next) => async (req) => {
       const token = sessionStorage.getItem('TOKEN');
       if (token) {
-        req.header.set("Authorization", `Bearer ${token}`);
+        req.header.set("authorization", `Bearer ${token}`); 
       }
       return await next(req);
     },
   ],
 });
+
 
 const userclient = createClient(UserService, transport);
 const mfaClient = createClient(MfaService, transport);
@@ -30,7 +31,6 @@ export default function Profile() {
     const [email, setEmail] = useState<string>('');
     const [mobile, setMobile] = useState<string>('');
     const [userpicture, setUserpicture] = useState<string>('');
-    const [token, setToken] = useState<string>('');
     const [newpassword, setNewPassword ] = useState<string>('');
     const [confnewpassword, setConfNewPassword ] = useState<string>('');    
     const [profileMsg, setProfileMsg] = useState<string>('');
@@ -41,23 +41,13 @@ export default function Profile() {
 
     useEffect(() => {
         const xidno = sessionStorage.getItem('USERID') || '';
-        const xtoken = sessionStorage.getItem('TOKEN') || '';
         queueMicrotask(() => {
             setUserid(xidno !== null ? xidno : '')
-            setToken(xtoken !== null ? xtoken : '');
+            // setToken(xtoken !== null ? xtoken : '');
         });
         const fetchUserData = async () => {
             try {
-                const response = await userclient.getUser(
-                    { 
-                        id: xidno 
-                    }
-                    // { 
-                    //     headers: { 
-                    //         Authorization: `Bearer ${token}`,
-                    //     }
-                    // }
-                );
+                const response = await userclient.getUser({ id: xidno });
 
                 const userpic = `http://localhost:8080/assets/users/${response.user?.userPic}`;
                 const qrcode = response.user?.qrcodeurl ?? '';
@@ -85,7 +75,7 @@ export default function Profile() {
 
         fetchUserData();
 
-    }, [userid, token]);
+    }, [userid]);
 
     const submitProfile = async (event: React.MouseEvent<HTMLButtonElement>) => {  
         event.preventDefault();
@@ -97,11 +87,6 @@ export default function Profile() {
                     lastname: lname,
                     mobile: mobile
                 }
-                // { 
-                //     headers: { 
-                //         Authorization: `Bearer ${token}`,
-                //     }
-                // }
             );
             setProfileMsg(response.textContent ?? '');
             setTimeout(() => { setProfileMsg(''); }, 3000);
@@ -125,7 +110,6 @@ export default function Profile() {
         const pix = URL.createObjectURL(file);
         jQuery('#userpic').attr('src', pix);
 
-        // Read file as Uint8Array for gRPC transmission
         const reader = new FileReader();
         reader.onload = async (e) => {
             if (!e.target?.result) return;
@@ -197,11 +181,6 @@ export default function Profile() {
                     id: userid,
                     twofactorenabled: true
                 }
-                // { 
-                //     headers: { 
-                //         Authorization: `Bearer ${token}`,
-                //     }
-                // }
             );
             setProfileMsg(response.textContent ?? '');
             setQrcodeurl(response.qrcodeurl ?? '');
@@ -224,11 +203,6 @@ export default function Profile() {
                     id: userid,
                     twofactorenabled: false
                 }
-                // { 
-                //     headers: { 
-                //         Authorization: `Bearer ${token}`,
-                //     }
-                // }
             );
             setProfileMsg(response.textContent ?? '');
             const qrcode = "http://localhost:8080/assets/images/qrcode.png";
@@ -271,16 +245,11 @@ export default function Profile() {
             return;            
         }
             try {
-                const response = await client.changePassword(
+                const response = await userclient.changePassword(
                     { 
                         id: userid,
                         password: newpassword
                     }
-                    // { 
-                    //     headers: { 
-                    //         Authorization: `Bearer ${token}`,
-                    //     }
-                    // }
                 );
                 setProfileMsg(response.textContent ?? '');
                 setTimeout(() => { setProfileMsg(''); }, 3000);
@@ -297,8 +266,6 @@ export default function Profile() {
 
     }
 
-    // if (error) return <div>Error: {error}</div>;
-    // if (!userState) return null;    
     return (
       <div className='profile-bg'>
         <div className="card card-profile mt-3">

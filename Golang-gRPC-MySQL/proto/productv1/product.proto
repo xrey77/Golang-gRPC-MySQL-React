@@ -37,8 +37,14 @@ message GetProductSearchResponse {
   int64 total_records = 3;
   repeated ProductData products = 4;
 }
+ 
+message GetProductReportRequest {}
+message GetProductReportResponse {
+  repeated ProductData products = 1;
+}
 
 service ProductService {
   rpc GetProductList (GetProductListRequest) returns (GetProductListResponse);
   rpc GetProductSearch(GetProductSearchRequest) returns (GetProductSearchResponse);
+  rpc GetProductPdfReport(GetProductReportRequest) returns (GetProductReportResponse);
 }

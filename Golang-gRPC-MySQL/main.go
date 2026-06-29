@@ -20,7 +20,6 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"time"
 
 	"github.com/bufbuild/connect-go"
 	"github.com/gin-contrib/cors"
@@ -71,6 +70,14 @@ func (h *mfaConnectHandler) MfaVerification(ctx context.Context, req *connect.Re
 }
 
 type productConnectHandler struct{ *server.ProductServer }
+
+func (h *productConnectHandler) GetProductPdfReport(ctx context.Context, req *connect.Request[productv1.GetProductReportRequest]) (*connect.Response[productv1.GetProductReportResponse], error) {
+	resp, err := h.ProductServer.GetProductPdfReport(ctx, req.Msg)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(resp), nil
+}
 
 func (h *productConnectHandler) GetProductList(ctx context.Context, req *connect.Request[productv1.GetProductListRequest]) (*connect.Response[productv1.GetProductListResponse], error) {
 	resp, err := h.ProductServer.GetProductList(ctx, req.Msg)
@@ -143,7 +150,6 @@ func (h *userConnectHandler) ChangePassword(ctx context.Context, req *connect.Re
 }
 
 func main() {
-	// 1. Initialize Database
 	dsn := "rey:rey@tcp(127.0.0.1:3306)/golang_grpc?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -165,15 +171,11 @@ func main() {
 		_ = r.SetTrustedProxies(nil)
 
 		r.Use(cors.New(cors.Config{
-			AllowOrigins: []string{"http://localhost:8080", "http://localhost", "http://localhost:5000", "http://localhost:5173"},
-			AllowMethods: []string{"GET", "POST", "OPTIONS", "PUT", "PATCH", "DELETE", "HEAD"},
-			AllowHeaders: []string{
-				"Origin", "Content-Length", "Content-Type", "Authorization",
-				"Connect-Protocol-Version", "Connect-Timeout", "X-Grpc-Web", "X-User-Agent",
-			},
-			ExposeHeaders:    []string{"Content-Length", "Grpc-Status", "Grpc-Message", "Connect-Error-Info"},
+			AllowOrigins:     []string{"http://localhost:5173"},
+			AllowMethods:     []string{"POST", "GET", "OPTIONS"},
+			AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "Connect-Protocol-Version"},
+			ExposeHeaders:    []string{"Content-Length", "Connect-Protocol-Version"},
 			AllowCredentials: true,
-			MaxAge:           12 * time.Hour,
 		}))
 
 		r.Use(static.Serve("/", static.LocalFile("templates", true)))
