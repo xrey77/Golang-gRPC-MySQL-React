@@ -20,6 +20,11 @@ type UploadImageServer struct {
 }
 
 func (s *UploadImageServer) UploadProfilePicture(ctx context.Context, req *uploadProto.UserPictureRequest) (*uploadProto.UserPictureResponse, error) {
+	_, err1 := validateToken(ctx)
+	if err1 != nil {
+		return nil, status.Error(codes.Unauthenticated, err1.Error())
+	}
+
 	if req.GetId() == "" {
 		return nil, status.Error(codes.InvalidArgument, "user ID is required")
 	}
@@ -40,12 +45,10 @@ func (s *UploadImageServer) UploadProfilePicture(ctx context.Context, req *uploa
 	newfile := "00" + req.GetId() + ext
 	dst := filepath.Join("./assets/users/", newfile)
 
-	// 2. Ensure destination directory exists
 	if err := os.MkdirAll(filepath.Dir(dst), os.ModePerm); err != nil {
 		return nil, status.Error(codes.Internal, "failed to create directory: "+err.Error())
 	}
 
-	// 3. Save the raw bytes directly to disk
 	if err := os.WriteFile(dst, req.GetFileData(), 0644); err != nil {
 		return nil, status.Error(codes.Internal, "upload file err: "+err.Error())
 	}

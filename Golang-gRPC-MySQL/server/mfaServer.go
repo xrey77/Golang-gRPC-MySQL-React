@@ -21,10 +21,10 @@ type MfaServer struct {
 }
 
 func (s *MfaServer) MfaActivation(ctx context.Context, req *mfaProto.MfaActivationRequest) (*mfaProto.MfaActivationResponse, error) {
-	// _, err1 := validateToken(ctx)
-	// if err1 != nil {
-	// 	return nil, status.Error(codes.Unauthenticated, err1.Error())
-	// }
+	_, err1 := validateToken(ctx)
+	if err1 != nil {
+		return nil, status.Error(codes.Unauthenticated, err1.Error())
+	}
 
 	if req.GetId() == "" {
 		return nil, status.Error(codes.InvalidArgument, "user ID is required")
@@ -104,10 +104,10 @@ func (s *MfaServer) MfaActivation(ctx context.Context, req *mfaProto.MfaActivati
 }
 
 func (s *MfaServer) MfaVerification(ctx context.Context, req *mfaProto.MfaVerifyRequest) (*mfaProto.MfaVerifyResponse, error) {
-	// _, err1 := validateToken(ctx)
-	// if err1 != nil {
-	// 	return nil, status.Error(codes.Unauthenticated, err1.Error())
-	// }
+	_, err1 := validateToken(ctx)
+	if err1 != nil {
+		return nil, status.Error(codes.Unauthenticated, err1.Error())
+	}
 
 	if req.GetId() == "" {
 		return nil, status.Error(codes.InvalidArgument, "user ID is required")
